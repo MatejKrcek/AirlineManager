@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:kiwi/models/offer.dart';
 import './screens/offers_overview_screen.dart';
-import './screens/flight_screen.dart';
 import './screens/main_overview_screen.dart';
+import './screens/inventory_screen.dart';
+import './screens/shop_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -24,6 +24,8 @@ class MyApp extends StatelessWidget {
       home: MainOverviewScreen(),
       routes: {
         OffersOverviewScreen.routeName: (ctx) => OffersOverviewScreen(),
+        InventoryScreen.routeName: (ctx) => InventoryScreen(),
+        ShopScreen.routeName: (ctx) => ShopScreen(),
         //FlightScreen.routeName: (ctx) => FlightScreen(),
       },
     );

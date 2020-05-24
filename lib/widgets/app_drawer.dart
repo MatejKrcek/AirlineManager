@@ -30,13 +30,17 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.airplanemode_active),
             title: Text('Inventory'),
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed('/inventory-screen');
+            },
           ),
           Divider(),
           ListTile(
             leading: Icon(Icons.shopping_cart),
-            title: Text('Airplane shop'),
-            onTap: () {},
+            title: Text('Shop'),
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed('/shop-screen');
+            },
           ),
         ],
       ),

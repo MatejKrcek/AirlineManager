@@ -21,7 +21,7 @@ class Offers extends StatelessWidget {
               title: Text(
                   '${offers[index].departureDes} -> ${offers[index].arrivalDes}'),
               subtitle: Text(
-                  '${offers[index].time} minutes, ${offers[index].price} USD'),
+                  '${offers[index].time} minutes, ${offers[index].price} coins'),
               trailing: FlatButton(
                   onPressed: () {
                     Navigator.push(

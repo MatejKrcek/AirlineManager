@@ -113,6 +113,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                 width: 160,
                                 height: 100,
                                 color: Colors.grey,
+                                child: Image.asset('assets/a330.jpg', fit: BoxFit.cover,),
                               ),
                               SizedBox(
                                 height: 10,
