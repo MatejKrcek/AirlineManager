@@ -9,6 +9,7 @@ class FlightScreen extends StatefulWidget {
   final String departureDes;
   final int price;
   final int time;
+  bool isRunning;
 
   FlightScreen(
     this.id,
@@ -16,6 +17,7 @@ class FlightScreen extends StatefulWidget {
     this.departureDes,
     this.price,
     this.time,
+    this.isRunning,
   );
 
   @override
@@ -23,6 +25,8 @@ class FlightScreen extends StatefulWidget {
 }
 
 class _FlightScreenState extends State<FlightScreen> {
+  DateTime arrivalTime;
+  Duration difference;
   double spinnerValue = 0;
   double prog = 0;
 
@@ -57,6 +61,20 @@ class _FlightScreenState extends State<FlightScreen> {
     prog = coordinates / timeLeft;
     // print(prog);
 
+    // pokud existuji data z databse, udelet toto?
+
+    // arrivalTime = DateTime.now().add(Duration(seconds: (widget.time * 60))); 
+    // print(arrivalTime);
+
+    // difference = arrivalTime.difference(DateTime.now());
+    // timeLeft = difference.inSeconds.toDouble(); 
+
+    // setState(() {
+    //   spinnerValue = prog * timeLeft;
+    // });
+
+    // print(spinnerValue);
+
     countdown = new Timer.periodic(
       oneSec,
       (Timer timer) => setState(
@@ -72,6 +90,7 @@ class _FlightScreenState extends State<FlightScreen> {
   }
 
   void update() {
+    //vola se kazdou sekundu
     setState(() {
       spinnerValue = spinnerValue + prog;
     });
@@ -91,6 +110,7 @@ class _FlightScreenState extends State<FlightScreen> {
 
     if (spinnerValue > coordinates) {
       isLoaded = true;
+      widget.isRunning = false;
       setState(() {
         status = 'Arrived';
       });
@@ -178,32 +198,6 @@ class _FlightScreenState extends State<FlightScreen> {
           SizedBox(
             height: 10,
           ),
-          // OutlineButton(
-          //   splashColor: Colors.white,
-          //   color: Colors.white,
-          //   onPressed: () {},
-          //   shape:
-          //       RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-          //   highlightElevation: 0,
-          //   borderSide: BorderSide(color: Theme.of(context).primaryColor),
-          //   child: Padding(
-          //     padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-          //     child: Row(
-          //       mainAxisSize: MainAxisSize.min,
-          //       mainAxisAlignment: MainAxisAlignment.center,
-          //       children: <Widget>[
-          //         Icon(Icons.info_outline),
-          //         Padding(
-          //           padding: const EdgeInsets.only(left: 10),
-          //           child: Text(
-          //             'More About the Flight',
-          //             style: TextStyle(),
-          //           ),
-          //         )
-          //       ],
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );

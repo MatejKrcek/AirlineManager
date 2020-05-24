@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:kiwi/widgets/app_drawer.dart';
 
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
+
+import '../widgets/app_drawer.dart';
 import '../models/offer.dart';
 import '../widgets/offers.dart';
 
@@ -19,6 +22,7 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
       arrivalDes: 'Kosice',
       price: 300,
       time: 10,
+      isRunning: false,
     ),
     Offer(
       id: 'p2',
@@ -26,8 +30,53 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
       arrivalDes: 'Brno',
       price: 50,
       time: 5,
+      isRunning: false,
     ),
   ];
+
+  data() async {
+    const url =
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/showOffers?userId=XYZ';
+
+    var response = await http.get(url);
+
+    try {
+      if (response.statusCode == 200) {
+        Map<String, dynamic> map = convert.jsonDecode(response.body);
+        print(map);
+        var myOffers = map['myOffers'];
+
+        for (var item in myOffers.keys) {
+          // print(item['price']);
+          // print(myOffers[item]['price']);
+          final List<Offer> testofferList = [
+            Offer(
+              id: item,
+              departureDes: myOffers[item]['departureDes'],
+              arrivalDes: myOffers[item]['arrivalDes'],
+              price: myOffers[item]['price'],
+              time: myOffers[item]['flightTime'],
+              isRunning: myOffers[item]['isRunning'],
+            ),
+          ];
+
+          print(testofferList[0].arrivalDes);
+          offerList.add(testofferList[0]);
+          print('id: ${offerList[2].isRunning}');
+        }
+      } else {
+        print('error');
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    data();
+  }
 
   @override
   Widget build(BuildContext context) {

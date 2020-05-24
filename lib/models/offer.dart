@@ -6,12 +6,14 @@ class Offer {
   String arrivalDes;
   int price;
   int time;
+  bool isRunning = false;
 
   Offer({
     @required this.id,
     @required this.departureDes,
     @required this.arrivalDes,
     @required this.price,
-    @required this.time
+    @required this.time,
+    @required this.isRunning,
   });
 }

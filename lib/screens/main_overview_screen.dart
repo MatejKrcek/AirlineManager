@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'dart:convert' as convert;
+import 'package:http/http.dart' as http;
+
 import '../widgets/app_drawer.dart';
+import '../models/user.dart';
+import '../models/airplane.dart';
 
 class MainOverviewScreen extends StatefulWidget {
   @override
@@ -8,8 +13,64 @@ class MainOverviewScreen extends StatefulWidget {
 }
 
 class _MainOverviewScreenState extends State<MainOverviewScreen> {
-  List myAircrafts = [1, 2, 3, 4];
   List myActiveOffers = [1, 2, 3, 4, 5];
+
+  final List<Airplane> myAirplanes = [
+    Airplane(
+      name: 'Airbus A330',
+      price: 1030,
+      distance: 1000,
+      seats: 330,
+      imageUrl:
+          'https://airbus-h.assetsadobe2.com/is/image/content/dam/channel-specific/website-/products-and-services/aircraft/header/aircraft-families/A330-family-stage.jpg?wid=1920&fit=fit,1&qlt=85,0',
+      onFlight: false,
+    ),
+    Airplane(
+      name: 'Airbus A320',
+      price: 800,
+      distance: 900,
+      seats: 200,
+      imageUrl:
+          'https://upload.wikimedia.org/wikipedia/commons/d/d6/Airbus_A320-214%2C_CSA_-_Czech_Airlines_AN1841815.jpg',
+      onFlight: false,
+    ),
+  ];
+
+  final List<User> users = [
+    User(
+      username: 'Matej',
+      airlineName: 'Kiwi Airlines',
+      coins: 5000,
+    ),
+  ];
+
+  data() async {
+    const url =
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/creditShow?userId=XYZ';
+
+    var response = await http.get(url);
+
+    try {
+      if (response.statusCode == 200) {
+        var jsonResponse = convert.jsonDecode(response.body);
+        print(jsonResponse['credit']);
+
+        setState(() {
+          users[0].coins = jsonResponse['credit'];
+        });
+      } else {
+        print('error');
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    data();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +88,11 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
               child: Column(
                 children: <Widget>[
                   ListTile(
-                    title: Text('User: Mathej'),
-                    trailing: Text('Coins: 3304'),
+                    title: Text('User: ${users[0].username}'),
+                    trailing: Text('Coins: ${users[0].coins}'),
                   ),
                   ListTile(
-                    title: Text('Airline: FlyEmirates'),
+                    title: Text('Airline: ${users[0].airlineName}'),
                   ),
                 ],
               ),
@@ -44,7 +105,10 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                   ListTile(
                     title: Text('Current offers'),
                     trailing: FlatButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context)
+                            .pushReplacementNamed('/offers-screen');
+                      },
                       child: Text(
                         'View All',
                         style: TextStyle(color: Theme.of(context).primaryColor),
@@ -55,9 +119,10 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                     color: Colors.grey,
                   ),
                   SizedBox(
-                    height: 120,
+                    height: 150,
                     child: ListView.builder(
-                      itemCount: (myActiveOffers.length >= 2)
+                      itemCount: (myActiveOffers.length >=
+                              2) //offers z database, vsechny, kde offers[index].isRunning = true;
                           ? 2
                           : myActiveOffers.length,
                       itemBuilder: (context, index) => ListTile(
@@ -65,8 +130,11 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                           'Prague -> Kosice',
                           style: TextStyle(fontSize: 15),
                         ),
+                        subtitle: Text('Remaining: 3 mins'),
                         trailing: FlatButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            data();
+                          },
                           child: Text(
                             'Details',
                             style: TextStyle(
@@ -89,7 +157,10 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                       'My Aircrafts',
                     ),
                     trailing: FlatButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context)
+                            .pushReplacementNamed('/inventory-screen');
+                      },
                       child: Text(
                         'View All',
                         style: TextStyle(color: Theme.of(context).primaryColor),
@@ -102,7 +173,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                       height: 230,
                       child: ListView.builder(
                         itemCount:
-                            (myAircrafts.length >= 3) ? 4 : myAircrafts.length,
+                            (myAirplanes.length >= 3) ? 4 : myAirplanes.length,
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (context, index) => Container(
                           margin: EdgeInsets.only(right: 10),
@@ -113,13 +184,16 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                 width: 160,
                                 height: 100,
                                 color: Colors.grey,
-                                child: Image.asset('assets/a330.jpg', fit: BoxFit.cover,),
+                                child: Image.network(
+                                  myAirplanes[index].imageUrl,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                               SizedBox(
                                 height: 10,
                               ),
                               Text(
-                                'Boing A300',
+                                myAirplanes[index].name,
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               SizedBox(
@@ -130,7 +204,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                   Container(
                                     margin: EdgeInsets.only(left: 10),
                                     child: Text(
-                                      'Range: 1000 km',
+                                      'Range: ${myAirplanes[index].distance} km',
                                       textAlign: TextAlign.left,
                                     ),
                                   ),
@@ -141,7 +215,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                   Container(
                                     margin: EdgeInsets.only(left: 10),
                                     child: Text(
-                                      'Seats: 300',
+                                      'Seats: ${myAirplanes[index].seats}',
                                       textAlign: TextAlign.left,
                                     ),
                                   ),
@@ -150,7 +224,16 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                               SizedBox(
                                 height: 10,
                               ),
-                              Text('On Flight'),
+                              Text(
+                                myAirplanes[index].onFlight
+                                    ? 'On Flight'
+                                    : 'Available',
+                                style: TextStyle(
+                                  color: myAirplanes[index].onFlight
+                                      ? Colors.red
+                                      : Colors.green,
+                                ),
+                              ),
                             ],
                           ),
                         ),

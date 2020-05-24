@@ -24,19 +24,22 @@ class Offers extends StatelessWidget {
                   '${offers[index].time} minutes, ${offers[index].price} coins'),
               trailing: FlatButton(
                   onPressed: () {
+                    offers[index].isRunning = true;
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => FlightScreen(
-                              offers[index].id,
-                              offers[index].arrivalDes,
-                              offers[index].departureDes,
-                              offers[index].price,
-                              offers[index].time)),
+                                offers[index].id,
+                                offers[index].arrivalDes,
+                                offers[index].departureDes,
+                                offers[index].price,
+                                offers[index].time,
+                                offers[index].isRunning,
+                              )),
                     );
                   },
                   child: Text(
-                    'CLAIM NOW',
+                    offers[index].isRunning ? 'View' : 'CLAIM NOW',
                     style: TextStyle(color: Theme.of(context).primaryColor),
                   )),
             ),
