@@ -16,22 +16,22 @@ class OffersOverviewScreen extends StatefulWidget {
 
 class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
   final List<Offer> offerList = [
-    Offer(
-      id: 'p1',
-      departureDes: 'Prague',
-      arrivalDes: 'Kosice',
-      price: 300,
-      time: 10,
-      isRunning: false,
-    ),
-    Offer(
-      id: 'p2',
-      departureDes: 'Prague',
-      arrivalDes: 'Brno',
-      price: 50,
-      time: 5,
-      isRunning: false,
-    ),
+    // Offer(
+    //   id: 'p1',
+    //   departureDes: 'Prague',
+    //   arrivalDes: 'Kosice',
+    //   price: 300,
+    //   time: 10,
+    //   isRunning: false,
+    // ),
+    // Offer(
+    //   id: 'p2',
+    //   departureDes: 'Prague',
+    //   arrivalDes: 'Brno',
+    //   price: 50,
+    //   time: 5,
+    //   isRunning: false,
+    // ),
   ];
 
   data() async {
@@ -43,7 +43,7 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
     try {
       if (response.statusCode == 200) {
         Map<String, dynamic> map = convert.jsonDecode(response.body);
-        print(map);
+        // print(map);
         var myOffers = map['myOffers'];
 
         for (var item in myOffers.keys) {
@@ -60,9 +60,12 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
             ),
           ];
 
-          print(testofferList[0].arrivalDes);
-          offerList.add(testofferList[0]);
-          print('id: ${offerList[2].isRunning}');
+          // print(testofferList[0].arrivalDes);
+          setState(() {
+            offerList.add(testofferList[0]);
+          });
+
+          // print('id: ${offerList[2].isRunning}');
         }
       } else {
         print('error');

@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import '../widgets/app_drawer.dart';
 import '../models/user.dart';
 import '../models/airplane.dart';
+import '../models/offer.dart';
 
 class MainOverviewScreen extends StatefulWidget {
   @override
@@ -14,6 +15,25 @@ class MainOverviewScreen extends StatefulWidget {
 
 class _MainOverviewScreenState extends State<MainOverviewScreen> {
   List myActiveOffers = [1, 2, 3, 4, 5];
+
+   final List<Offer> offerList = [
+    // Offer(
+    //   id: 'p1',
+    //   departureDes: 'Prague',
+    //   arrivalDes: 'Kosice',
+    //   price: 300,
+    //   time: 10,
+    //   isRunning: false,
+    // ),
+    // Offer(
+    //   id: 'p2',
+    //   departureDes: 'Prague',
+    //   arrivalDes: 'Brno',
+    //   price: 50,
+    //   time: 5,
+    //   isRunning: false,
+    // ),
+  ];
 
   final List<Airplane> myAirplanes = [
     Airplane(
@@ -66,10 +86,52 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
     }
   }
 
+  loadOffer() async {
+    const url =
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/showOffers?userId=XYZ';
+
+    var response = await http.get(url);
+
+    try {
+      if (response.statusCode == 200) {
+        Map<String, dynamic> map = convert.jsonDecode(response.body);
+        // print(map);
+        var myOffers = map['myOffers'];
+
+        for (var item in myOffers.keys) {
+          // print(item['price']);
+          // print(myOffers[item]['price']);
+          final List<Offer> testofferList = [
+            Offer(
+              id: item,
+              departureDes: myOffers[item]['departureDes'],
+              arrivalDes: myOffers[item]['arrivalDes'],
+              price: myOffers[item]['price'],
+              time: myOffers[item]['flightTime'],
+              isRunning: myOffers[item]['isRunning'],
+            ),
+          ];
+
+          // print(testofferList[0].arrivalDes);
+          setState(() {
+            offerList.add(testofferList[0]);
+          });
+
+          // print('id: ${offerList[2].isRunning}');
+        }
+      } else {
+        print('error');
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     data();
+    loadOffer();
   }
 
   @override
@@ -121,13 +183,13 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                   SizedBox(
                     height: 150,
                     child: ListView.builder(
-                      itemCount: (myActiveOffers.length >=
+                      itemCount: (offerList.length >=
                               2) //offers z database, vsechny, kde offers[index].isRunning = true;
                           ? 2
-                          : myActiveOffers.length,
+                          : offerList.length,
                       itemBuilder: (context, index) => ListTile(
                         title: Text(
-                          'Prague -> Kosice',
+                          '${offerList[index].departureDes} -> ${offerList[index].arrivalDes}',
                           style: TextStyle(fontSize: 15),
                         ),
                         subtitle: Text('Remaining: 3 mins'),
