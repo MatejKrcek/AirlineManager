@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../widgets/app_drawer.dart';
 import '../models/airplane.dart';
+import './airplane_detail_screen.dart';
 
 class InventoryScreen extends StatefulWidget {
   static const routeName = '/inventory-screen';
@@ -11,7 +12,6 @@ class InventoryScreen extends StatefulWidget {
 }
 
 class _InventoryScreenState extends State<InventoryScreen> {
-
   final List<Airplane> myAirplanes = [
     Airplane(
       name: 'Airbus A330',
@@ -55,7 +55,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
             child: GridTile(
               child: GestureDetector(
                 onTap: () {
-                  print('a');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AirplaneDetailScreen(
+                              index,
+                            )),
+                  );
                 },
                 child: Image.network(
                   myAirplanes[index].imageUrl,

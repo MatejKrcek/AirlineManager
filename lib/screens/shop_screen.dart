@@ -51,7 +51,7 @@ class _ShopScreenState extends State<ShopScreen> {
     User(
       username: 'Matej',
       airlineName: 'Kiwi Airlines',
-      coins: 5000,
+      coins: 0,
     ),
   ];
 
@@ -192,6 +192,12 @@ class _ShopScreenState extends State<ShopScreen> {
       body: Center(
         child: Column(
           children: <Widget>[
+            Card(
+              elevation: 5,
+              child: ListTile(
+                title: Text('My coins: ${users[0].coins}'),
+              ),
+            ),
             Card(
               elevation: 5,
               margin: const EdgeInsets.all(10),
