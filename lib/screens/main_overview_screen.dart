@@ -14,7 +14,7 @@ class MainOverviewScreen extends StatefulWidget {
 }
 
 class _MainOverviewScreenState extends State<MainOverviewScreen> {
-  List myActiveOffers = [1, 2, 3, 4, 5];
+  bool isLoading = false;
 
   final List<Offer> offerList = [
     // Offer(
@@ -60,42 +60,57 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
     User(
       username: 'Matej',
       airlineName: 'Kiwi Airlines',
-      coins: 5000,
+      coins: 0,
     ),
   ];
 
   Future data() async {
+    setState(() {
+      isLoading = true;
+    });
+
     const url =
         'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/creditShow?userId=XYZ';
 
-    var response = await http.get(url);
-
     try {
+      var response = await http.get(url);
+
       if (response.statusCode == 200) {
         var jsonResponse = convert.jsonDecode(response.body);
         print(jsonResponse['credit']);
 
-        return setState(() {
+        setState(() {
           users[0].coins = jsonResponse['credit'];
+          isLoading = false;
         });
+        print(users[0].coins);
       } else {
         print('error');
+        setState(() {
+          isLoading = false;
+        });
       }
     } catch (error) {
       print(error);
     }
   }
 
-  loadOffer() async {
+  Future loadOffer() async {
+    print(offerList);
     const url =
         'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/showOffers?userId=XYZ';
 
-    var response = await http.get(url);
-
     try {
+      var response = await http.get(url);
+
       if (response.statusCode == 200) {
         Map<String, dynamic> map = convert.jsonDecode(response.body);
         // print(map);
+
+        if (map == null) {
+          return;
+        }
+
         var myOffers = map['myOffers'];
 
         for (var item in myOffers.keys) {
@@ -119,11 +134,13 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
 
           // print('id: ${offerList[2].isRunning}');
         }
+        print('done');
+        return;
       } else {
-        print('error');
+        print('error load');
       }
     } catch (error) {
-      print(error);
+      throw error;
     }
   }
 
@@ -154,7 +171,9 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                   children: <Widget>[
                     ListTile(
                       title: Text('User: ${users[0].username}'),
-                      trailing: Text('Coins: ${users[0].coins}'),
+                      trailing: Text(isLoading
+                          ? 'Loading...'
+                          : 'Coins: ${users[0].coins}'),
                     ),
                     ListTile(
                       title: Text('Airline: ${users[0].airlineName}'),
@@ -187,27 +206,27 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                     SizedBox(
                       height: 150,
                       child: ListView.builder(
-                        itemCount: (offerList.length >=
-                                2) //offers z database, vsechny, kde offers[index].isRunning = true;
-                            ? 2
-                            : offerList.length,
-                        itemBuilder: (context, index) => ListTile(
-                          title: Text(
-                            '${offerList[index].departureDes} -> ${offerList[index].arrivalDes}',
-                            style: TextStyle(fontSize: 15),
-                          ),
-                          subtitle: Text('Time to claim: 3 mins'),
-                          trailing: FlatButton(
-                            onPressed: () {
-                              data();
-                            },
-                            child: Text(
-                              'Details',
-                              style: TextStyle(
-                                  color: Theme.of(context).primaryColor),
-                            ),
-                          ),
-                        ),
+                        itemCount:
+                            (offerList.length >= 2) ? 2 : offerList.length,
+                        itemBuilder: (context, index) => offerList.isNotEmpty
+                            ? ListTile(
+                                title: Text(
+                                  '${offerList[index].departureDes} -> ${offerList[index].arrivalDes}',
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                                subtitle: Text(
+                                    'Claim ${offerList[index].price.toString()} coins now!'),
+                              )
+                            : Column(
+                                children: <Widget>[
+                                  Container(
+                                    margin: EdgeInsets.all(15),
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
+                                ],
+                              ),
                       ),
                     ),
                   ],
@@ -235,77 +254,90 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                       ),
                     ),
                     SizedBox(
-                      height: 235,
+                      height: myAirplanes.length == 0 ? 100 : 235,
                       child: Container(
                         height: 230,
-                        child: ListView.builder(
-                          itemCount: (myAirplanes.length >= 3)
-                              ? 4
-                              : myAirplanes.length,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) => Container(
-                            margin: EdgeInsets.only(right: 10),
-                            width: 160,
-                            child: Column(
-                              children: <Widget>[
-                                Container(
+                        child: myAirplanes.length == 0
+                            ? Center(
+                                child: Text(
+                                    'Hey! You have no airplane! Visit shop!'))
+                            : ListView.builder(
+                                itemCount: (myAirplanes.length >= 3)
+                                    ? 4
+                                    : myAirplanes.length,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) => Container(
+                                  margin: EdgeInsets.only(right: 10),
                                   width: 160,
-                                  height: 100,
-                                  color: Colors.grey,
-                                  child: Image.network(
-                                    myAirplanes[index].imageUrl,
-                                    fit: BoxFit.cover,
+                                  child: Column(
+                                    children: <Widget>[
+                                      Container(
+                                        width: 160,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.grey,
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: Image.network(
+                                            myAirplanes[index].imageUrl,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        myAirplanes[index].name,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Container(
+                                            margin: EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              'Range: ${myAirplanes[index].distance} km',
+                                              textAlign: TextAlign.left,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Container(
+                                            margin: EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              'Seats: ${myAirplanes[index].seats}',
+                                              textAlign: TextAlign.left,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        myAirplanes[index].onFlight
+                                            ? 'On Flight'
+                                            : 'Available',
+                                        style: TextStyle(
+                                          color: myAirplanes[index].onFlight
+                                              ? Colors.red
+                                              : Colors.green,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  myAirplanes[index].name,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  children: <Widget>[
-                                    Container(
-                                      margin: EdgeInsets.only(left: 10),
-                                      child: Text(
-                                        'Range: ${myAirplanes[index].distance} km',
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: <Widget>[
-                                    Container(
-                                      margin: EdgeInsets.only(left: 10),
-                                      child: Text(
-                                        'Seats: ${myAirplanes[index].seats}',
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  myAirplanes[index].onFlight
-                                      ? 'On Flight'
-                                      : 'Available',
-                                  style: TextStyle(
-                                    color: myAirplanes[index].onFlight
-                                        ? Colors.red
-                                        : Colors.green,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                              ),
                       ),
                     ),
                   ],

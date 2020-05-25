@@ -1,5 +1,7 @@
 import 'dart:async';
-import 'dart:io';
+
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 
 import 'package:flutter/material.dart';
 
@@ -29,6 +31,8 @@ class _FlightScreenState extends State<FlightScreen> {
   Duration difference;
   double spinnerValue = 0;
   double prog = 0;
+
+  int reward;
 
   Timer timer;
   Timer countdown;
@@ -63,11 +67,11 @@ class _FlightScreenState extends State<FlightScreen> {
 
     // pokud existuji data z databse, udelet toto?
 
-    // arrivalTime = DateTime.now().add(Duration(seconds: (widget.time * 60))); 
+    // arrivalTime = DateTime.now().add(Duration(seconds: (widget.time * 60)));
     // print(arrivalTime);
 
     // difference = arrivalTime.difference(DateTime.now());
-    // timeLeft = difference.inSeconds.toDouble(); 
+    // timeLeft = difference.inSeconds.toDouble();
 
     // setState(() {
     //   spinnerValue = prog * timeLeft;
@@ -115,6 +119,26 @@ class _FlightScreenState extends State<FlightScreen> {
         status = 'Arrived';
       });
       timer.cancel();
+      getCoins();
+    }
+  }
+
+  Future getCoins() async {
+    reward = widget.price;
+    print('volam');
+    var url =
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/creditAdd?userId=XYZ&creditAmount=$reward';
+
+    try {
+      var response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        print('pridano $reward');
+      } else {
+        print('error');
+      }
+    } catch (error) {
+      print(error);
     }
   }
 
