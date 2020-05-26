@@ -205,29 +205,36 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                     ),
                     SizedBox(
                       height: 150,
-                      child: ListView.builder(
-                        itemCount:
-                            (offerList.length >= 2) ? 2 : offerList.length,
-                        itemBuilder: (context, index) => offerList.isNotEmpty
-                            ? ListTile(
-                                title: Text(
-                                  '${offerList[index].departureDes} -> ${offerList[index].arrivalDes}',
-                                  style: TextStyle(fontSize: 15),
-                                ),
-                                subtitle: Text(
-                                    'Claim ${offerList[index].price.toString()} coins now!'),
-                              )
-                            : Column(
-                                children: <Widget>[
-                                  Container(
-                                    margin: EdgeInsets.all(15),
-                                    child: Center(
-                                      child: CircularProgressIndicator(),
+                      child: offerList.isNotEmpty
+                          ? ListView.builder(
+                              itemCount: (offerList.length >= 2)
+                                  ? 2
+                                  : offerList.length,
+                              itemBuilder: (context, index) => offerList[index]
+                                      .arrivalDes
+                                      .isEmpty
+                                  ? Column(
+                                      children: <Widget>[
+                                        Container(
+                                          margin: EdgeInsets.all(15),
+                                          child: Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : ListTile(
+                                      title: Text(
+                                        '${offerList[index].departureDes} -> ${offerList[index].arrivalDes}',
+                                        style: TextStyle(fontSize: 15),
+                                      ),
+                                      subtitle: Text(
+                                          'Claim ${offerList[index].price.toString()} coins now!'),
                                     ),
-                                  ),
-                                ],
-                              ),
-                      ),
+                            )
+                          : Center(
+                              child: CircularProgressIndicator(),
+                            ),
                     ),
                   ],
                 ),

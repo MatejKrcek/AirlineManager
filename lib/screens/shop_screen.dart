@@ -6,6 +6,7 @@ import 'dart:convert' as convert;
 import '../widgets/app_drawer.dart';
 import '../models/airplane.dart';
 import '../models/user.dart';
+import '../storage/data.dart';
 
 class ShopScreen extends StatefulWidget {
   static const routeName = '/shop-screen';
@@ -34,6 +35,27 @@ class _ShopScreenState extends State<ShopScreen> {
       seats: 200,
       imageUrl:
           'https://upload.wikimedia.org/wikipedia/commons/d/d6/Airbus_A320-214%2C_CSA_-_Czech_Airlines_AN1841815.jpg',
+      onFlight: false,
+    ),
+    Airplane(
+      name: 'Airbus A320',
+      price: 800,
+      distance: 900,
+      seats: 200,
+      imageUrl:
+          'https://upload.wikimedia.org/wikipedia/commons/d/d6/Airbus_A320-214%2C_CSA_-_Czech_Airlines_AN1841815.jpg',
+      onFlight: false,
+    ),
+  ];
+
+  List<Airplane> myAirplanes = [
+    Airplane(
+      name: 'Airbus A330',
+      price: 1030,
+      distance: 1000,
+      seats: 330,
+      imageUrl:
+          'https://airbus-h.assetsadobe2.com/is/image/content/dam/channel-specific/website-/products-and-services/aircraft/header/aircraft-families/A330-family-stage.jpg?wid=1920&fit=fit,1&qlt=85,0',
       onFlight: false,
     ),
     Airplane(
@@ -106,7 +128,10 @@ class _ShopScreenState extends State<ShopScreen> {
     if (users[0].coins >= listOfAirplanes[index].price) {
       users[0].coins = users[0].coins - listOfAirplanes[index].price;
       removeCoins(listOfAirplanes[index].price);
-      print('bought');
+
+      myAirplanes.add(listOfAirplanes[index]);
+      print(myAirplanes.length);
+
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         duration: Duration(seconds: 2),
         content: Text('Congrats!'),
@@ -273,13 +298,19 @@ class _ShopScreenState extends State<ShopScreen> {
                                 '${listOfAirplanes[index].price.toString()} coins',
                               ),
                               FlatButton(
-                                onPressed: () {
-                                  _showDialog(index);
-                                },
+                                onPressed: users[0].coins <
+                                        listOfAirplanes[index].price
+                                    ? null
+                                    : () {
+                                        _showDialog(index);
+                                      },
                                 child: Text(
                                   'Buy now',
                                   style: TextStyle(
-                                    color: Theme.of(context).primaryColor,
+                                    color: users[0].coins <
+                                            listOfAirplanes[index].price
+                                        ? Colors.grey
+                                        : Theme.of(context).primaryColor,
                                   ),
                                 ),
                               )

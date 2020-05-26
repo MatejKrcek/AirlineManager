@@ -1,9 +1,10 @@
-import 'dart:async';
+import 'package:flutter/material.dart';
 
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
-import 'package:flutter/material.dart';
+import './offers_overview_screen.dart';
 
 class FlightScreen extends StatefulWidget {
   final String id;
@@ -28,7 +29,7 @@ class FlightScreen extends StatefulWidget {
 
 class _FlightScreenState extends State<FlightScreen> {
   DateTime arrivalTime;
-  Duration difference;
+  Duration difference = Duration(seconds: 0);
   double spinnerValue = 0;
   double prog = 0;
 
@@ -61,23 +62,31 @@ class _FlightScreenState extends State<FlightScreen> {
   double cooordKos = 0.253333;
 
   void loader() {
+    // if (widget.isRunning) {
+    //   difference = arrivalTime.difference(DateTime.now());
+    //   print(difference);
+    //   timeLeft = difference.inSeconds.toDouble();
+
+    //   setState(() {
+    //     spinnerValue = prog * timeLeft;
+    //   });
+
+    //   print(spinnerValue);
+    //   widget.isRunning = !widget.isRunning;
+    //   print(widget.isRunning);
+    // }
     timeLeft = widget.time.toDouble() * 60;
     prog = coordinates / timeLeft;
-    // print(prog);
+    print(prog);
+    arrivalTime = DateTime.now().add(Duration(seconds: (widget.time * 60)));
+    print(arrivalTime);
+    setState(() {
+      widget.isRunning = true;
+    });
+
+    print(widget.isRunning);
 
     // pokud existuji data z databse, udelet toto?
-
-    // arrivalTime = DateTime.now().add(Duration(seconds: (widget.time * 60)));
-    // print(arrivalTime);
-
-    // difference = arrivalTime.difference(DateTime.now());
-    // timeLeft = difference.inSeconds.toDouble();
-
-    // setState(() {
-    //   spinnerValue = prog * timeLeft;
-    // });
-
-    // print(spinnerValue);
 
     countdown = new Timer.periodic(
       oneSec,
@@ -142,6 +151,24 @@ class _FlightScreenState extends State<FlightScreen> {
     }
   }
 
+  Future saveOffer() async {
+    print('volam');
+    // var url =
+    //     '';
+
+    // try {
+    //   var response = await http.get(url);
+
+    //   if (response.statusCode == 200) {
+    //     print('pridano $reward');
+    //   } else {
+    //     print('error');
+    //   }
+    // } catch (error) {
+    //   print(error);
+    // }
+  }  
+
   @override
   void initState() {
     super.initState();
@@ -160,7 +187,6 @@ class _FlightScreenState extends State<FlightScreen> {
       width = widthBrn;
       height = heightBrn;
     }
-
     loader();
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) => update());
   }
@@ -177,6 +203,22 @@ class _FlightScreenState extends State<FlightScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Detail'),
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () async {
+            await saveOffer();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => OffersOverviewScreen(
+                      // widget.id,
+                      // widget.isRunning,
+                      // arrivalTime,
+                      )),
+            );
+          },
+        ),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,

@@ -4,13 +4,13 @@ import './screens/offers_overview_screen.dart';
 import './screens/main_overview_screen.dart';
 import './screens/inventory_screen.dart';
 import './screens/shop_screen.dart';
+import './screens/stats_screen.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         OffersOverviewScreen.routeName: (ctx) => OffersOverviewScreen(),
         InventoryScreen.routeName: (ctx) => InventoryScreen(),
         ShopScreen.routeName: (ctx) => ShopScreen(),
-        //FlightScreen.routeName: (ctx) => FlightScreen(),
+        StatsScreen.routeName: (ctx) => StatsScreen(),
       },
     );
   }

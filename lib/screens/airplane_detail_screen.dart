@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:http/http.dart' as http;
+import 'package:kiwi/screens/inventory_screen.dart';
+import 'dart:convert' as convert;
+
 import '../models/airplane.dart';
 
 class AirplaneDetailScreen extends StatefulWidget {
@@ -14,6 +18,8 @@ class AirplaneDetailScreen extends StatefulWidget {
 }
 
 class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   final List<Airplane> myAirplanes = [
     Airplane(
       name: 'Airbus A330',
@@ -35,9 +41,100 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
     ),
   ];
 
+  Future addCoins() async {
+    var url =
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/creditAdd?userId=XYZ&creditAmount=${myAirplanes[widget.index].price}';
+
+    try {
+      var response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        var jsonResponse = convert.jsonDecode(response.body);
+        print(jsonResponse['credit']);
+        _scaffoldKey.currentState.showSnackBar(SnackBar(
+          duration: Duration(seconds: 2),
+          content: Text('Sold!'),
+        ));
+      } else {
+        print('error');
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  void removeAirplane() {
+    myAirplanes.removeAt(widget.index);
+  }
+
+  void _showDialog(int index) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          elevation: 5,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          title: Text("Are you sure?"),
+          content: RichText(
+            text: TextSpan(
+              text: 'Do you want to sell ',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+              ),
+              children: <TextSpan>[
+                TextSpan(
+                  text: myAirplanes[index].name,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(
+                  text: ' for ',
+                  style: TextStyle(fontWeight: FontWeight.normal),
+                ),
+                TextSpan(
+                  text: myAirplanes[index].price.toString(),
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(
+                  text: ' coins?',
+                  style: TextStyle(fontWeight: FontWeight.normal),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text("Sell now"),
+              onPressed: () {
+                addCoins();
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InventoryScreen()),
+                );
+                removeAirplane();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Inventory - ${myAirplanes[widget.index].name}'),
       ),
@@ -112,6 +209,25 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
                           bottom: 5,
                         ),
                         child: Text(
+                          myAirplanes[widget.index].onFlight
+                              ? 'Status: On Flight'
+                              : 'Status: In Hangar',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(
+                          left: 15,
+                          bottom: 5,
+                        ),
+                        child: Text(
                           'Price: ${myAirplanes[widget.index].price}',
                           textAlign: TextAlign.left,
                           style: TextStyle(
@@ -121,7 +237,9 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 20,),
+                  SizedBox(
+                    height: 20,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -132,7 +250,9 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
                             style: TextStyle(
                                 color: Theme.of(context).primaryColor),
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            _showDialog(widget.index);
+                          },
                         ),
                       ),
                     ],

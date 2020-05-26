@@ -10,6 +10,12 @@ import '../widgets/offers.dart';
 class OffersOverviewScreen extends StatefulWidget {
   static const routeName = '/offers-screen';
 
+  // final String id;
+  // final bool isRunning;
+  // final DateTime arrivalTime;
+
+  // OffersOverviewScreen(this.id, this.isRunning, this.arrivalTime);
+
   @override
   _OffersOverviewScreenState createState() => _OffersOverviewScreenState();
 }
@@ -34,13 +40,13 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
     // ),
   ];
 
-  data() async {
+  Future data() async {
     const url =
         'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/showOffers?userId=XYZ';
 
-    var response = await http.get(url);
-
     try {
+      var response = await http.get(url);
+
       if (response.statusCode == 200) {
         Map<String, dynamic> map = convert.jsonDecode(response.body);
         // print(map);
@@ -88,7 +94,11 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
         title: Text('Airline offers'),
       ),
       drawer: AppDrawer(),
-      body: Offers(offerList),
+      body: offerList.isNotEmpty
+          ? Offers(offerList)
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 }

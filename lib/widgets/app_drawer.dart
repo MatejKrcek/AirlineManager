@@ -42,6 +42,14 @@ class AppDrawer extends StatelessWidget {
               Navigator.of(context).pushReplacementNamed('/shop-screen');
             },
           ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.show_chart),
+            title: Text('Statistics'),
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed('/stats-screen');
+            },
+          ),
         ],
       ),
     );

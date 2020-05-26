@@ -50,29 +50,29 @@ class _InventoryScreenState extends State<InventoryScreen> {
             mainAxisSpacing: 10,
           ),
           itemCount: myAirplanes.length,
-          itemBuilder: (context, index) => ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: GridTile(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AirplaneDetailScreen(
-                              index,
-                            )),
-                  );
-                },
+          itemBuilder: (context, index) => GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => AirplaneDetailScreen(
+                          index,
+                        )),
+              );
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: GridTile(
                 child: Image.network(
                   myAirplanes[index].imageUrl,
                   fit: BoxFit.cover,
                 ),
-              ),
-              footer: GridTileBar(
-                backgroundColor: Colors.black87,
-                title: Text(
-                  myAirplanes[index].name,
-                  textAlign: TextAlign.center,
+                footer: GridTileBar(
+                  backgroundColor: Colors.black87,
+                  title: Text(
+                    myAirplanes[index].name,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
             ),
