@@ -17,50 +17,6 @@ class MainOverviewScreen extends StatefulWidget {
 
 class _MainOverviewScreenState extends State<MainOverviewScreen> {
   bool isLoading = false;
-  int airCraftCount = 0;
-  int flightOffersCount = 0;
-
-  final List<Offer> offerList = [
-    // Offer(
-    //   id: 'p1',
-    //   departureDes: 'Prague',
-    //   arrivalDes: 'Kosice',
-    //   price: 300,
-    //   time: 10,
-    //   isRunning: false,
-    // ),
-    // Offer(
-    //   id: 'p2',
-    //   departureDes: 'Prague',
-    //   arrivalDes: 'Brno',
-    //   price: 50,
-    //   time: 5,
-    //   isRunning: false,
-    // ),
-  ];
-
-  final List<Airplane> myAirplanes = [
-    Airplane(
-      name: 'Airbus A330',
-      price: 1030,
-      distance: 1000,
-      seats: 330,
-      id: 'SUSJ',
-      speed: 293,
-      imageUrl:
-          'https://airbus-h.assetsadobe2.com/is/image/content/dam/channel-specific/website-/products-and-services/aircraft/header/aircraft-families/A330-family-stage.jpg?wid=1920&fit=fit,1&qlt=85,0',
-    ),
-    Airplane(
-      name: 'Airbus A320',
-      price: 800,
-      distance: 900,
-      seats: 200,
-      id: 'SUSJ',
-      speed: 293,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/d/d6/Airbus_A320-214%2C_CSA_-_Czech_Airlines_AN1841815.jpg',
-    ),
-  ];
 
   final List<User> user = [];
   List<MyFlights> myFlights = [];
@@ -68,108 +24,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
   int countPlanes = 0;
   int countFlights = 0;
 
-  // Future getUser() async {
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-
-  //   const url =
-  //       'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=0d865038-de6d-4d50-9728-37a415ad8bdd';
-
-  //   try {
-  //     var response = await http.get(url);
-
-  //     if (response.statusCode == 200) {
-  //       Map<String, dynamic> map = convert.jsonDecode(response.body);
-
-  //       if (map == null) {
-  //         return;
-  //       }
-
-  //       var airplanes = map['aircrafts'];
-  //       List<MyAirplane> myPlanes = [];
-
-  //       for (var item in airplanes.keys) {
-  //         final List<MyAirplane> otherData = [
-  //           MyAirplane(
-  //             id: item,
-  //             name: airplanes[item]['name'],
-  //             imageUrl: airplanes[item]['imageUrl'],
-  //             seats: airplanes[item]['capacity'],
-  //             price: airplanes[item]['price'],
-  //             onFlight: airplanes[item]['onFlight'],
-  //             distance: airplanes[item]['range'],
-  //             totalFlightDistance: airplanes[item]['totalDistance'],
-  //             speed: airplanes[item]['speed'],
-  //             totalFlightTime: airplanes[item]['totalFlightTime'],
-  //             totalFlights: airplanes[item]['totalFlights'],
-  //             aircraftIdentity: airplanes[item]['aircraftIdentity'],
-  //           ),
-  //         ];
-
-  //         myPlanes.add(otherData[0]);
-  //         airCraftCount = myPlanes.length;
-  //       }
-
-  //       var flights = map['flights'];
-  //       List<MyFlights> myFlights = [];
-
-  //       for (var item in flights.keys) {
-  //         final List<MyFlights> otherDataF = [
-  //           MyFlights(
-  //             id: item,
-  //             arrivalDes: flights[item]['arrivalDes'],
-  //             departureDes: flights[item]['departureDes'],
-  //             aircraft: flights[item]['aircraft'],
-  //             departureTime: flights[item]['departureTime'],
-  //             reward: flights[item]['reward'],
-  //             onAir: flights[item]['onAir'],
-  //             flightNumber: flights[item]['flightNo'],
-  //           ),
-  //         ];
-  //         setState(() {
-  //           myFlights.add(otherDataF[0]);
-  //         });
-  //         flightOffersCount = myFlights.length;
-  //       }
-
-  //       final List<User> currentUser = [
-  //         User(
-  //           id: "0d865038-de6d-4d50-9728-37a415ad8bdd",
-  //           username: map['name'],
-  //           airlineName: map['airlineName'],
-  //           coins: map['coins'],
-  //           gems: map['gems'],
-  //           pilotRank: map['pilotRank'],
-  //           gameLevel: map['gameLevel'],
-  //           profilePictureUrl: map['profilePictureUrl'],
-  //           totalFlightDistance: map['flightDistance'],
-  //           totalFlightTime: map['flightTime'],
-  //           aircrafts: myPlanes[0],
-  //           flights: myFlights[0],
-  //           created: map['dateCreation'],
-  //           login: map['dateLogin'],
-  //         ),
-  //       ];
-  //       setState(() {
-  //         user.add(currentUser[0]);
-  //         isLoading = false;
-  //       });
-  //       //print(user[0].flights);
-  //       // print(user[0].aircrafts.name);
-  //       // print(user[0].flights.departureDes);
-  //     } else {
-  //       print('error');
-  //       setState(() {
-  //         isLoading = false;
-  //       });
-  //     }
-  //   } catch (error) {
-  //     print(error);
-  //   }
-  // }
-
-  Future test() async {
+  Future getData() async {
     setState(() {
       isLoading = true;
       countPlanes = 0;
@@ -231,6 +86,8 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
         }
         // print(myFlights[countFlights].departureDes);
         countFlights = myPlanes.length - 1;
+        print(countFlights);
+        print(myPlanes.length);
         // print(myFlights[countFlights].departureDes);
 
         final List<User> newUser = [
@@ -270,7 +127,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
   @override
   void initState() {
     super.initState();
-    test();
+    getData();
     // getUser();
   }
 
@@ -282,7 +139,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
       ),
       drawer: AppDrawer(),
       body: RefreshIndicator(
-        onRefresh: () => test(),
+        onRefresh: () => getData(),
         child: SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),
           child: Column(
@@ -334,7 +191,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                       height: 150,
                       child: !isLoading
                           ? ListView.builder(
-                              itemCount: countFlights,
+                              itemCount: countFlights - 1,
                               itemBuilder: (context, index) => ListTile(
                                 title: Text(
                                   isLoading
@@ -376,7 +233,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                       ),
                     ),
                     SizedBox(
-                      height: myAirplanes.length == 0 ? 100 : 235,
+                      height: countPlanes == 0 ? 100 : 235,
                       child: Container(
                         height: 230,
                         child: countPlanes == 0
