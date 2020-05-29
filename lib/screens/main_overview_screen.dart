@@ -85,9 +85,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
           myFlights.add(prepsFlights[0]);
         }
         // print(myFlights[countFlights].departureDes);
-        countFlights = myPlanes.length - 1;
-        print(countFlights);
-        print(myPlanes.length);
+        countFlights = myFlights.length - 1;
         // print(myFlights[countFlights].departureDes);
 
         final List<User> newUser = [
@@ -191,7 +189,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                       height: 150,
                       child: !isLoading
                           ? ListView.builder(
-                              itemCount: countFlights - 1,
+                              itemCount: countFlights + 1,
                               itemBuilder: (context, index) => ListTile(
                                 title: Text(
                                   isLoading
@@ -204,8 +202,8 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                     : 'Claim ${myFlights[index].reward.toString()} coins now!'),
                               ),
                             )
-                          : Center(
-                              child: CircularProgressIndicator(),
+                          : const Center(
+                              child: const CircularProgressIndicator(),
                             ),
                     ),
                   ],

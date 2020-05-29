@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:kiwi/screens/inventory_screen.dart';
 import 'dart:convert' as convert;
 
-import '../models/airplane.dart';
+import '../models/user.dart';
+import '../models/myAirplanes.dart';
 
 class AirplaneDetailScreen extends StatefulWidget {
   final int index;
@@ -20,53 +21,90 @@ class AirplaneDetailScreen extends StatefulWidget {
 class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final List<Airplane> myAirplanes = [
-    Airplane(
-      name: 'Airbus A330',
-      price: 1030,
-      id: 'FSFA',
-      distance: 1000,
-      seats: 330,
-      speed: 240,
-      imageUrl:
-          'https://airbus-h.assetsadobe2.com/is/image/content/dam/channel-specific/website-/products-and-services/aircraft/header/aircraft-families/A330-family-stage.jpg?wid=1920&fit=fit,1&qlt=85,0',
-    ),
-    Airplane(
-      name: 'Airbus A320',
-      price: 800,
-      distance: 900,
-      seats: 200,
-      speed: 220,
-      id: '8FSFA',
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/d/d6/Airbus_A320-214%2C_CSA_-_Czech_Airlines_AN1841815.jpg',
-    ),
-  ];
+  bool isLoading = false;
+  final List<User> user = [];
+  List<MyAirplane> myPlanes = [];
+  int countPlanes = 0;
 
-  Future addCoins() async {
-    var url =
-        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/creditAdd?userId=XYZ&creditAmount=${myAirplanes[widget.index].price}';
+  Future getData() async {
+    setState(() {
+      isLoading = true;
+      countPlanes = 0;
+      myPlanes = [];
+    });
+
+    const url =
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=0d865038-de6d-4d50-9728-37a415ad8bdd';
 
     try {
       var response = await http.get(url);
 
       if (response.statusCode == 200) {
-        var jsonResponse = convert.jsonDecode(response.body);
-        print(jsonResponse['credit']);
-        _scaffoldKey.currentState.showSnackBar(SnackBar(
-          duration: Duration(seconds: 2),
-          content: Text('Sold!'),
-        ));
+        Map<String, dynamic> map = convert.jsonDecode(response.body);
+
+        if (map == null) {
+          return;
+        }
+
+        var airplanes = map['aircrafts'];
+        for (var item in airplanes.keys) {
+          List<MyAirplane> preps = [
+            MyAirplane(
+              id: item,
+              name: airplanes[item]['name'],
+              imageUrl: airplanes[item]['imageUrl'],
+              seats: airplanes[item]['capacity'],
+              price: airplanes[item]['price'],
+              onFlight: airplanes[item]['onFlight'],
+              distance: airplanes[item]['range'],
+              totalFlightDistance: airplanes[item]['totalDistance'],
+              speed: airplanes[item]['speed'],
+              totalFlightTime: airplanes[item]['totalFlightTime'],
+              totalFlights: airplanes[item]['totalFlights'],
+              aircraftIdentity: airplanes[item]['aircraftIdentity'],
+            ),
+          ];
+          myPlanes.add(preps[0]);
+        }
+        countPlanes = myPlanes.length - 1;
+        print(myPlanes.length);
+
+        final List<User> newUser = [
+          User(
+            id: "0d865038-de6d-4d50-9728-37a415ad8bdd",
+            username: map['name'],
+            airlineName: map['airlineName'],
+            coins: map['coins'],
+            gems: map['gems'],
+            pilotRank: map['pilotRank'],
+            gameLevel: map['gameLevel'],
+            profilePictureUrl: map['profilePictureUrl'],
+            totalFlightDistance: map['flightDistance'],
+            totalFlightTime: map['flightTime'],
+            created: map['dateCreation'],
+            login: map['dateLogin'],
+          ),
+        ];
+        user.add(newUser[0]);
+        print(countPlanes);
+        setState(() {
+          isLoading = false;
+        });
       } else {
         print('error');
+        setState(() {
+          isLoading = false;
+        });
       }
     } catch (error) {
       print(error);
     }
   }
 
-  void removeAirplane() {
-    myAirplanes.removeAt(widget.index);
+  @override
+  void initState() {
+    super.initState();
+    getData();
   }
 
   void _showDialog(int index) {
@@ -90,7 +128,7 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
               ),
               children: <TextSpan>[
                 TextSpan(
-                  text: myAirplanes[index].name,
+                  text: myPlanes[index].name,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextSpan(
@@ -98,7 +136,7 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
                   style: TextStyle(fontWeight: FontWeight.normal),
                 ),
                 TextSpan(
-                  text: myAirplanes[index].price.toString(),
+                  text: myPlanes[index].price.toString(),
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextSpan(
@@ -118,13 +156,11 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
             FlatButton(
               child: Text("Sell now"),
               onPressed: () {
-                addCoins();
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => InventoryScreen()),
                 );
-                removeAirplane();
               },
             ),
           ],
@@ -138,133 +174,139 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Inventory - ${myAirplanes[widget.index].name}'),
+        title: Text(isLoading
+            ? 'Detail'
+            : 'Detail - ${myPlanes[widget.index].name}'),
       ),
-      body: Container(
-        margin: EdgeInsets.all(10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.grey,
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  myAirplanes[widget.index].imageUrl,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Card(
-              elevation: 5,
+      body: isLoading
+          ? const Center(
+              child: const CircularProgressIndicator(),
+            )
+          : Container(
+              margin: EdgeInsets.all(10),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  ListTile(
-                    title: Text('Name: ${myAirplanes[widget.index].name}'),
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(
-                          left: 15,
-                          bottom: 5,
-                        ),
-                        child: Text(
-                          'Seats: ${myAirplanes[widget.index].seats}',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            fontSize: 15,
-                          ),
-                        ),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.grey,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.network(
+                        myPlanes[widget.index].imageUrl,
+                        fit: BoxFit.cover,
                       ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(
-                          left: 15,
-                          bottom: 5,
-                        ),
-                        child: Text(
-                          'Flight distance: ${myAirplanes[widget.index].distance}',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  // Row(
-                  //   children: <Widget>[
-                  //     Container(
-                  //       margin: EdgeInsets.only(
-                  //         left: 15,
-                  //         bottom: 5,
-                  //       ),
-                  //       child: Text(
-                  //         myAirplanes[widget.index].onFlight
-                  //             ? 'Status: On Flight'
-                  //             : 'Status: In Hangar',
-                  //         textAlign: TextAlign.left,
-                  //         style: TextStyle(
-                  //           fontSize: 15,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(
-                          left: 15,
-                          bottom: 5,
-                        ),
-                        child: Text(
-                          'Price: ${myAirplanes[widget.index].price}',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                   SizedBox(
                     height: 20,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        child: FlatButton(
-                          child: Text(
-                            'SELL NOW',
-                            style: TextStyle(
-                                color: Theme.of(context).primaryColor),
-                          ),
-                          onPressed: () {
-                            _showDialog(widget.index);
-                          },
+                  Card(
+                    elevation: 5,
+                    child: Column(
+                      children: <Widget>[
+                        ListTile(
+                          title: Text('Name: ${myPlanes[widget.index].name}'),
                         ),
-                      ),
-                    ],
+                        Row(
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(
+                                left: 15,
+                                bottom: 5,
+                              ),
+                              child: Text(
+                                'Seats: ${myPlanes[widget.index].seats}',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(
+                                left: 15,
+                                bottom: 5,
+                              ),
+                              child: Text(
+                                'Flight distance: ${myPlanes[widget.index].distance}',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        // Row(
+                        //   children: <Widget>[
+                        //     Container(
+                        //       margin: EdgeInsets.only(
+                        //         left: 15,
+                        //         bottom: 5,
+                        //       ),
+                        //       child: Text(
+                        //         myAirplanes[widget.index].onFlight
+                        //             ? 'Status: On Flight'
+                        //             : 'Status: In Hangar',
+                        //         textAlign: TextAlign.left,
+                        //         style: TextStyle(
+                        //           fontSize: 15,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
+                        Row(
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(
+                                left: 15,
+                                bottom: 5,
+                              ),
+                              child: Text(
+                                'Price: ${myPlanes[widget.index].price}',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              child: FlatButton(
+                                child: Text(
+                                  'SELL NOW',
+                                  style: TextStyle(
+                                      color: Theme.of(context).primaryColor),
+                                ),
+                                onPressed: () {
+                                  _showDialog(widget.index);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }
