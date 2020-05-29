@@ -6,7 +6,6 @@ import 'dart:convert' as convert;
 import '../widgets/app_drawer.dart';
 import '../models/airplane.dart';
 import '../models/user.dart';
-import '../storage/data.dart';
 
 class ShopScreen extends StatefulWidget {
   static const routeName = '/shop-screen';
@@ -18,54 +17,28 @@ class ShopScreen extends StatefulWidget {
 class _ShopScreenState extends State<ShopScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  final List<Airplane> listOfAirplanes = [
-    Airplane(
-      name: 'Airbus A330',
-      price: 10300,
-      distance: 1000,
-      seats: 330,
-      imageUrl:
-          'https://airbus-h.assetsadobe2.com/is/image/content/dam/channel-specific/website-/products-and-services/aircraft/header/aircraft-families/A330-family-stage.jpg?wid=1920&fit=fit,1&qlt=85,0',
-      onFlight: false,
-    ),
-    Airplane(
-      name: 'Airbus A320',
-      price: 800,
-      distance: 900,
-      seats: 200,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/d/d6/Airbus_A320-214%2C_CSA_-_Czech_Airlines_AN1841815.jpg',
-      onFlight: false,
-    ),
-    Airplane(
-      name: 'Airbus A320',
-      price: 800,
-      distance: 900,
-      seats: 200,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/d/d6/Airbus_A320-214%2C_CSA_-_Czech_Airlines_AN1841815.jpg',
-      onFlight: false,
-    ),
-  ];
+  final List<Airplane> listOfAirplanes = [];
 
-  List<Airplane> myAirplanes = [
+  final List<Airplane> myAirplanes = [
     Airplane(
       name: 'Airbus A330',
       price: 1030,
+      id: 'FSFA',
       distance: 1000,
       seats: 330,
+      speed: 240,
       imageUrl:
           'https://airbus-h.assetsadobe2.com/is/image/content/dam/channel-specific/website-/products-and-services/aircraft/header/aircraft-families/A330-family-stage.jpg?wid=1920&fit=fit,1&qlt=85,0',
-      onFlight: false,
     ),
     Airplane(
       name: 'Airbus A320',
       price: 800,
       distance: 900,
       seats: 200,
+      speed: 220,
+      id: '8FSFA',
       imageUrl:
           'https://upload.wikimedia.org/wikipedia/commons/d/d6/Airbus_A320-214%2C_CSA_-_Czech_Airlines_AN1841815.jpg',
-      onFlight: false,
     ),
   ];
 
@@ -80,44 +53,48 @@ class _ShopScreenState extends State<ShopScreen> {
   @override
   void initState() {
     super.initState();
-    getCoins();
+    getAirlanes();
   }
 
-  Future getCoins() async {
+  Future getAirlanes() async {
     const url =
-        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/creditShow?userId=XYZ';
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=aircrafts';
 
     try {
       var response = await http.get(url);
 
       if (response.statusCode == 200) {
-        var jsonResponse = convert.jsonDecode(response.body);
+        Map<String, dynamic> map = convert.jsonDecode(response.body);
+        // print(map);
 
-        setState(() {
-          users[0].coins = jsonResponse['credit'];
-        });
-        print(jsonResponse['credit']);
-      } else {
-        print('error');
-      }
-    } catch (error) {
-      print(error);
-    }
-  }
+        if (map == null) {
+          return;
+        }
 
-  Future removeCoins(int removeAmount) async {
-    var url =
-        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/creditRemove?userId=XYZ&creditAmount=$removeAmount';
+        // var airplanes = map['airplanes'];
+        // print(airplanes);
+        // print(map);
 
-    try {
-      var response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        var jsonResponse = convert.jsonDecode(response.body);
-        print(jsonResponse['credit']);
-        getCoins();
-      } else {
-        print('error');
+        for (var item in map.keys) {
+          // print(item['price']);
+          // print(myOffers[item]['price']);
+          final List<Airplane> airplaneListDb = [
+            Airplane(
+              id: item,
+              name: map[item]['name'],
+              speed: map[item]['speed'],
+              price: map[item]['price'],
+              seats: map[item]['capacity'],
+              distance: map[item]['range'],
+              imageUrl: map[item]['imageUrl'],
+            ),
+          ];
+          print(airplaneListDb);
+          // print(testofferList[0].arrivalDes);
+          setState(() {
+            listOfAirplanes.add(airplaneListDb[0]);
+          });
+        }
       }
     } catch (error) {
       print(error);
@@ -127,7 +104,7 @@ class _ShopScreenState extends State<ShopScreen> {
   void _buy(int index) {
     if (users[0].coins >= listOfAirplanes[index].price) {
       users[0].coins = users[0].coins - listOfAirplanes[index].price;
-      removeCoins(listOfAirplanes[index].price);
+      // removeCoins(listOfAirplanes[index].price);
 
       myAirplanes.add(listOfAirplanes[index]);
       print(myAirplanes.length);
@@ -234,7 +211,7 @@ class _ShopScreenState extends State<ShopScreen> {
                     ),
                   ),
                   SizedBox(
-                    height: 250,
+                    height: 280,
                     child: Container(
                       child: ListView.builder(
                         itemCount: listOfAirplanes.length,
@@ -286,6 +263,17 @@ class _ShopScreenState extends State<ShopScreen> {
                                     margin: EdgeInsets.only(left: 10),
                                     child: Text(
                                       'Seats: ${listOfAirplanes[index].seats.toString()}',
+                                      textAlign: TextAlign.left,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Container(
+                                    margin: EdgeInsets.only(left: 10),
+                                    child: Text(
+                                      'Speed: ${listOfAirplanes[index].speed.toString()}',
                                       textAlign: TextAlign.left,
                                     ),
                                   ),

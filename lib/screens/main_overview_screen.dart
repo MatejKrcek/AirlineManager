@@ -7,6 +7,8 @@ import '../widgets/app_drawer.dart';
 import '../models/user.dart';
 import '../models/airplane.dart';
 import '../models/offer.dart';
+import '../models/myAirplanes.dart';
+import '../models/myFlights.dart';
 
 class MainOverviewScreen extends StatefulWidget {
   @override
@@ -15,6 +17,8 @@ class MainOverviewScreen extends StatefulWidget {
 
 class _MainOverviewScreenState extends State<MainOverviewScreen> {
   bool isLoading = false;
+  int airCraftCount = 0;
+  int flightOffersCount = 0;
 
   final List<Offer> offerList = [
     // Offer(
@@ -41,49 +45,217 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
       price: 1030,
       distance: 1000,
       seats: 330,
+      id: 'SUSJ',
+      speed: 293,
       imageUrl:
           'https://airbus-h.assetsadobe2.com/is/image/content/dam/channel-specific/website-/products-and-services/aircraft/header/aircraft-families/A330-family-stage.jpg?wid=1920&fit=fit,1&qlt=85,0',
-      onFlight: false,
     ),
     Airplane(
       name: 'Airbus A320',
       price: 800,
       distance: 900,
       seats: 200,
+      id: 'SUSJ',
+      speed: 293,
       imageUrl:
           'https://upload.wikimedia.org/wikipedia/commons/d/d6/Airbus_A320-214%2C_CSA_-_Czech_Airlines_AN1841815.jpg',
-      onFlight: false,
     ),
   ];
 
-  final List<User> users = [
-    User(
-      username: 'Matej',
-      airlineName: 'Kiwi Airlines',
-      coins: 0,
-    ),
-  ];
+  final List<User> user = [];
+  List<MyFlights> myFlights = [];
+  List<MyAirplane> myPlanes = [];
+  int countPlanes = 0;
+  int countFlights = 0;
 
-  Future data() async {
+  // Future getUser() async {
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+
+  //   const url =
+  //       'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=0d865038-de6d-4d50-9728-37a415ad8bdd';
+
+  //   try {
+  //     var response = await http.get(url);
+
+  //     if (response.statusCode == 200) {
+  //       Map<String, dynamic> map = convert.jsonDecode(response.body);
+
+  //       if (map == null) {
+  //         return;
+  //       }
+
+  //       var airplanes = map['aircrafts'];
+  //       List<MyAirplane> myPlanes = [];
+
+  //       for (var item in airplanes.keys) {
+  //         final List<MyAirplane> otherData = [
+  //           MyAirplane(
+  //             id: item,
+  //             name: airplanes[item]['name'],
+  //             imageUrl: airplanes[item]['imageUrl'],
+  //             seats: airplanes[item]['capacity'],
+  //             price: airplanes[item]['price'],
+  //             onFlight: airplanes[item]['onFlight'],
+  //             distance: airplanes[item]['range'],
+  //             totalFlightDistance: airplanes[item]['totalDistance'],
+  //             speed: airplanes[item]['speed'],
+  //             totalFlightTime: airplanes[item]['totalFlightTime'],
+  //             totalFlights: airplanes[item]['totalFlights'],
+  //             aircraftIdentity: airplanes[item]['aircraftIdentity'],
+  //           ),
+  //         ];
+
+  //         myPlanes.add(otherData[0]);
+  //         airCraftCount = myPlanes.length;
+  //       }
+
+  //       var flights = map['flights'];
+  //       List<MyFlights> myFlights = [];
+
+  //       for (var item in flights.keys) {
+  //         final List<MyFlights> otherDataF = [
+  //           MyFlights(
+  //             id: item,
+  //             arrivalDes: flights[item]['arrivalDes'],
+  //             departureDes: flights[item]['departureDes'],
+  //             aircraft: flights[item]['aircraft'],
+  //             departureTime: flights[item]['departureTime'],
+  //             reward: flights[item]['reward'],
+  //             onAir: flights[item]['onAir'],
+  //             flightNumber: flights[item]['flightNo'],
+  //           ),
+  //         ];
+  //         setState(() {
+  //           myFlights.add(otherDataF[0]);
+  //         });
+  //         flightOffersCount = myFlights.length;
+  //       }
+
+  //       final List<User> currentUser = [
+  //         User(
+  //           id: "0d865038-de6d-4d50-9728-37a415ad8bdd",
+  //           username: map['name'],
+  //           airlineName: map['airlineName'],
+  //           coins: map['coins'],
+  //           gems: map['gems'],
+  //           pilotRank: map['pilotRank'],
+  //           gameLevel: map['gameLevel'],
+  //           profilePictureUrl: map['profilePictureUrl'],
+  //           totalFlightDistance: map['flightDistance'],
+  //           totalFlightTime: map['flightTime'],
+  //           aircrafts: myPlanes[0],
+  //           flights: myFlights[0],
+  //           created: map['dateCreation'],
+  //           login: map['dateLogin'],
+  //         ),
+  //       ];
+  //       setState(() {
+  //         user.add(currentUser[0]);
+  //         isLoading = false;
+  //       });
+  //       //print(user[0].flights);
+  //       // print(user[0].aircrafts.name);
+  //       // print(user[0].flights.departureDes);
+  //     } else {
+  //       print('error');
+  //       setState(() {
+  //         isLoading = false;
+  //       });
+  //     }
+  //   } catch (error) {
+  //     print(error);
+  //   }
+  // }
+
+  Future test() async {
     setState(() {
       isLoading = true;
+      countPlanes = 0;
+      countFlights = 0;
+      myFlights = [];
+      myPlanes = [];
     });
 
     const url =
-        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/creditShow?userId=XYZ';
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=0d865038-de6d-4d50-9728-37a415ad8bdd';
 
     try {
       var response = await http.get(url);
 
       if (response.statusCode == 200) {
-        var jsonResponse = convert.jsonDecode(response.body);
-        print(jsonResponse['credit']);
+        Map<String, dynamic> map = convert.jsonDecode(response.body);
 
+        if (map == null) {
+          return;
+        }
+
+        var airplanes = map['aircrafts'];
+        for (var item in airplanes.keys) {
+          List<MyAirplane> preps = [
+            MyAirplane(
+              id: item,
+              name: airplanes[item]['name'],
+              imageUrl: airplanes[item]['imageUrl'],
+              seats: airplanes[item]['capacity'],
+              price: airplanes[item]['price'],
+              onFlight: airplanes[item]['onFlight'],
+              distance: airplanes[item]['range'],
+              totalFlightDistance: airplanes[item]['totalDistance'],
+              speed: airplanes[item]['speed'],
+              totalFlightTime: airplanes[item]['totalFlightTime'],
+              totalFlights: airplanes[item]['totalFlights'],
+              aircraftIdentity: airplanes[item]['aircraftIdentity'],
+            ),
+          ];
+          myPlanes.add(preps[0]);
+        }
+        countPlanes = myPlanes.length - 1;
+
+        var flights = map['flights'];
+        for (var item in flights.keys) {
+          List<MyFlights> prepsFlights = [
+            MyFlights(
+              id: item,
+              arrivalDes: flights[item]['arrivalDes'],
+              departureDes: flights[item]['departureDes'],
+              aircraft: flights[item]['aircraft'],
+              departureTime: flights[item]['departureTime'],
+              reward: flights[item]['reward'],
+              onAir: flights[item]['onAir'],
+              flightNumber: flights[item]['flightNo'],
+            ),
+          ];
+          myFlights.add(prepsFlights[0]);
+        }
+        // print(myFlights[countFlights].departureDes);
+        countFlights = myPlanes.length - 1;
+        // print(myFlights[countFlights].departureDes);
+
+        final List<User> newUser = [
+          User(
+            id: "0d865038-de6d-4d50-9728-37a415ad8bdd",
+            username: map['name'],
+            airlineName: map['airlineName'],
+            coins: map['coins'],
+            gems: map['gems'],
+            pilotRank: map['pilotRank'],
+            gameLevel: map['gameLevel'],
+            profilePictureUrl: map['profilePictureUrl'],
+            totalFlightDistance: map['flightDistance'],
+            totalFlightTime: map['flightTime'],
+            // aircrafts: MyAirplane.add(),
+            // flights: myFlights[0],
+            created: map['dateCreation'],
+            login: map['dateLogin'],
+          ),
+        ];
+        user.add(newUser[0]);
+        print(countPlanes);
         setState(() {
-          users[0].coins = jsonResponse['credit'];
           isLoading = false;
         });
-        print(users[0].coins);
       } else {
         print('error');
         setState(() {
@@ -95,60 +267,11 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
     }
   }
 
-  Future loadOffer() async {
-    print(offerList);
-    const url =
-        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/showOffers?userId=XYZ';
-
-    try {
-      var response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        Map<String, dynamic> map = convert.jsonDecode(response.body);
-        // print(map);
-
-        if (map == null) {
-          return;
-        }
-
-        var myOffers = map['myOffers'];
-
-        for (var item in myOffers.keys) {
-          // print(item['price']);
-          // print(myOffers[item]['price']);
-          final List<Offer> testofferList = [
-            Offer(
-              id: item,
-              departureDes: myOffers[item]['departureDes'],
-              arrivalDes: myOffers[item]['arrivalDes'],
-              price: myOffers[item]['price'],
-              time: myOffers[item]['flightTime'],
-              isRunning: myOffers[item]['isRunning'],
-            ),
-          ];
-
-          // print(testofferList[0].arrivalDes);
-          setState(() {
-            offerList.add(testofferList[0]);
-          });
-
-          // print('id: ${offerList[2].isRunning}');
-        }
-        print('done');
-        return;
-      } else {
-        print('error load');
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    data();
-    loadOffer();
+    test();
+    // getUser();
   }
 
   @override
@@ -159,7 +282,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
       ),
       drawer: AppDrawer(),
       body: RefreshIndicator(
-        onRefresh: () => data(),
+        onRefresh: () => test(),
         child: SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),
           child: Column(
@@ -170,13 +293,17 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                 child: Column(
                   children: <Widget>[
                     ListTile(
-                      title: Text('User: ${users[0].username}'),
+                      title: Text(isLoading
+                          ? 'Loading...'
+                          : 'User: ${user[0].username}'),
                       trailing: Text(isLoading
                           ? 'Loading...'
-                          : 'Coins: ${users[0].coins}'),
+                          : 'Coins: ${user[0].coins.toString()}'),
                     ),
                     ListTile(
-                      title: Text('Airline: ${users[0].airlineName}'),
+                      title: Text(isLoading
+                          ? 'Loading...'
+                          : 'Airline: ${user[0].airlineName}'),
                     ),
                   ],
                 ),
@@ -205,32 +332,20 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                     ),
                     SizedBox(
                       height: 150,
-                      child: offerList.isNotEmpty
+                      child: !isLoading
                           ? ListView.builder(
-                              itemCount: (offerList.length >= 2)
-                                  ? 2
-                                  : offerList.length,
-                              itemBuilder: (context, index) => offerList[index]
-                                      .arrivalDes
-                                      .isEmpty
-                                  ? Column(
-                                      children: <Widget>[
-                                        Container(
-                                          margin: EdgeInsets.all(15),
-                                          child: Center(
-                                            child: CircularProgressIndicator(),
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  : ListTile(
-                                      title: Text(
-                                        '${offerList[index].departureDes} -> ${offerList[index].arrivalDes}',
-                                        style: TextStyle(fontSize: 15),
-                                      ),
-                                      subtitle: Text(
-                                          'Claim ${offerList[index].price.toString()} coins now!'),
-                                    ),
+                              itemCount: countFlights,
+                              itemBuilder: (context, index) => ListTile(
+                                title: Text(
+                                  isLoading
+                                      ? 'Loading...'
+                                      : '${myFlights[index].departureDes} -> ${myFlights[index].arrivalDes}',
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                                subtitle: Text(isLoading
+                                    ? 'Loading...'
+                                    : 'Claim ${myFlights[index].reward.toString()} coins now!'),
+                              ),
                             )
                           : Center(
                               child: CircularProgressIndicator(),
@@ -264,14 +379,12 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                       height: myAirplanes.length == 0 ? 100 : 235,
                       child: Container(
                         height: 230,
-                        child: myAirplanes.length == 0
+                        child: countPlanes == 0
                             ? Center(
                                 child: Text(
                                     'Hey! You have no airplane! Visit shop!'))
                             : ListView.builder(
-                                itemCount: (myAirplanes.length >= 3)
-                                    ? 4
-                                    : myAirplanes.length,
+                                itemCount: countPlanes + 1,
                                 scrollDirection: Axis.horizontal,
                                 itemBuilder: (context, index) => Container(
                                   margin: EdgeInsets.only(right: 10),
@@ -290,7 +403,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           child: Image.network(
-                                            myAirplanes[index].imageUrl,
+                                            myPlanes[index].imageUrl,
                                             fit: BoxFit.cover,
                                           ),
                                         ),
@@ -299,7 +412,9 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                         height: 10,
                                       ),
                                       Text(
-                                        myAirplanes[index].name,
+                                        isLoading
+                                            ? 'Loading...'
+                                            : myPlanes[index].name,
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold),
                                       ),
@@ -311,7 +426,9 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                           Container(
                                             margin: EdgeInsets.only(left: 10),
                                             child: Text(
-                                              'Range: ${myAirplanes[index].distance} km',
+                                              isLoading
+                                                  ? 'Loading...'
+                                                  : 'Range: ${myPlanes[index].distance.toString()} km',
                                               textAlign: TextAlign.left,
                                             ),
                                           ),
@@ -322,7 +439,9 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                           Container(
                                             margin: EdgeInsets.only(left: 10),
                                             child: Text(
-                                              'Seats: ${myAirplanes[index].seats}',
+                                              isLoading
+                                                  ? 'Loading...'
+                                                  : 'Seats: ${myPlanes[index].seats.toString()}',
                                               textAlign: TextAlign.left,
                                             ),
                                           ),
@@ -332,13 +451,13 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                         height: 10,
                                       ),
                                       Text(
-                                        myAirplanes[index].onFlight
-                                            ? 'On Flight'
-                                            : 'Available',
+                                        myPlanes[index].onFlight == ""
+                                            ? 'Available'
+                                            : 'On Flight',
                                         style: TextStyle(
-                                          color: myAirplanes[index].onFlight
-                                              ? Colors.red
-                                              : Colors.green,
+                                          color: myPlanes[index].onFlight == ""
+                                              ? Colors.green
+                                              : Colors.red,
                                         ),
                                       ),
                                     ],

@@ -4,6 +4,10 @@ class Offer {
   String id;
   String departureDes;
   String arrivalDes;
+  // int expiration;
+  // int range;
+  // int created;
+  // int minCapacity;
   int price;
   int time;
   bool isRunning = false;
