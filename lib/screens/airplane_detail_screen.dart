@@ -101,6 +101,23 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
     }
   }
 
+  Future sell() async {
+    var url =
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/sellAircraft?personId=0d865038-de6d-4d50-9728-37a415ad8bdd&aircraftIdentity=${myPlanes[widget.index].id}';
+
+    try {
+      var response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        print('done');
+      } else {
+        print('error');
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -155,7 +172,8 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
             ),
             FlatButton(
               child: Text("Sell now"),
-              onPressed: () {
+              onPressed: () async {
+                await sell();
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
@@ -174,9 +192,8 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(isLoading
-            ? 'Detail'
-            : 'Detail - ${myPlanes[widget.index].name}'),
+        title: Text(
+            isLoading ? 'Detail' : 'Detail - ${myPlanes[widget.index].name}'),
       ),
       body: isLoading
           ? const Center(

@@ -74,6 +74,9 @@ class _ShopScreenState extends State<ShopScreen> {
   }
 
   Future getAirlanes() async {
+    setState(() {
+      isLoading = true;
+    });
     const url =
         'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=aircrafts';
 
@@ -104,6 +107,12 @@ class _ShopScreenState extends State<ShopScreen> {
             listOfAirplanes.add(airplaneListDb[0]);
           });
         }
+        setState(() {
+          isLoading = false;
+        });
+
+        listOfAirplanes.sort((a, b) => a.name.compareTo(b.name));
+        print(listOfAirplanes[0].name);
       } else {
         print('error');
         setState(() {
@@ -147,9 +156,6 @@ class _ShopScreenState extends State<ShopScreen> {
         ];
         user.add(newUser[0]);
         print(countPlanes);
-        setState(() {
-          isLoading = false;
-        });
       } else {
         print('error');
         setState(() {
