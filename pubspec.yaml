@@ -24,6 +24,8 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.12.1  
+  firebase_auth: ^0.16.1
+  google_sign_in: ^4.5.1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -59,7 +61,8 @@ flutter:
     - assets/a320.jpg
     - assets/a330.jpg
     - assets/atr72.jpg
-  #   - images/a_dot_ham.jpeg
+    - assets/google_logo.png
+  
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

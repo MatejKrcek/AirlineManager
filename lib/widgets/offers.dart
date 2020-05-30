@@ -59,7 +59,7 @@ class Offers extends StatelessWidget {
                     }
                   },
                   child: Text(
-                    myActiveFlights.length - 1 >= index ? 'VIEW' : 'CLAIN NOW',
+                    myActiveFlights.length - 1 >= index ? 'VIEW' : 'CLAIM NOW',
                     style: TextStyle(
                         color: myActiveFlights.length - 1 >= index
                             ? Theme.of(context).accentColor
