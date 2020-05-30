@@ -9,6 +9,7 @@ class MyFlights {
   bool onAir;
   String flightNumber;
   int reward;
+  int flightTime;
 
   MyFlights({
     @required this.id,
@@ -19,5 +20,6 @@ class MyFlights {
     @required this.onAir,
     @required this.departureTime,
     @required this.reward,
+    @required this.flightTime,
   });
 }

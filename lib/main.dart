@@ -5,6 +5,7 @@ import './screens/main_overview_screen.dart';
 import './screens/inventory_screen.dart';
 import './screens/shop_screen.dart';
 import './screens/stats_screen.dart';
+import './screens/flight_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         InventoryScreen.routeName: (ctx) => InventoryScreen(),
         ShopScreen.routeName: (ctx) => ShopScreen(),
         StatsScreen.routeName: (ctx) => StatsScreen(),
+        //FlightScreen.routeName: (ctx) => FlightScreen(false, 0),
       },
     );
   }

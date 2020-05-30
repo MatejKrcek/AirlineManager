@@ -80,6 +80,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
               reward: flights[item]['reward'],
               onAir: flights[item]['onAir'],
               flightNumber: flights[item]['flightNo'],
+              flightTime: flights[item]['flightTime'],
             ),
           ];
           myFlights.add(prepsFlights[0]);
@@ -169,7 +170,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                 child: Column(
                   children: <Widget>[
                     ListTile(
-                      title: Text('Featured offers'),
+                      title: Text('Active flights'),
                       trailing: FlatButton(
                         onPressed: () {
                           Navigator.of(context)

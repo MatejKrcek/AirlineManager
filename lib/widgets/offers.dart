@@ -1,46 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:kiwi/screens/flight_screen.dart';
 
+import '../models/myFlights.dart';
 import '../models/offer.dart';
 
 class Offers extends StatelessWidget {
-  final List<Offer> offers;
+  final List<Offer> flights;
+  final List<MyFlights> myActiveFlights;
 
-  Offers(this.offers);
+  Offers(this.flights, this.myActiveFlights);
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: offers.length,
+      itemCount: flights.length,
       itemBuilder: (context, index) => Card(
         elevation: 5,
         margin: EdgeInsets.all(10),
         child: Column(
           children: <Widget>[
             ListTile(
-              title: Text(
-                  '${offers[index].departureDes} -> ${offers[index].arrivalDes}'),
-              subtitle: Text(
-                  '${offers[index].time} minutes, ${offers[index].price} coins'),
+              title: Text(myActiveFlights.length - 1 >= index
+                  ? '${myActiveFlights[index].departureDes} -> ${myActiveFlights[index].arrivalDes}'
+                  : '${flights[index].departureDes} -> ${flights[index].arrivalDes}'),
+              subtitle: Text(myActiveFlights.length - 1 >= index
+                  ? 'Reward: ${myActiveFlights[index].reward.toString()} coins'
+                  : 'Reward: ${flights[index].price.toString()} coins'),
               trailing: FlatButton(
                   onPressed: () {
-                    offers[index].isRunning = true;
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => FlightScreen(
-                                offers[index].id,
-                                offers[index].arrivalDes,
-                                offers[index].departureDes,
-                                offers[index].price,
-                                offers[index].time,
-                                offers[index].isRunning,
-                              )),
-                    );
+                    if (myActiveFlights.length - 1 >= index) {
+                      for (var i = 0; i <= index - i; i++) {
+                        print('cau');
+                        if (flights[i].departureDes ==
+                                myActiveFlights[i].departureDes &&
+                            flights[i].arrivalDes ==
+                                myActiveFlights[i].arrivalDes &&
+                            flights[i].price ==
+                                myActiveFlights[i].reward) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    FlightScreen(true, index)),
+                          );
+                        }
+                      }
+                    } else {
+                      print('asss');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => FlightScreen(false, index)),
+                      );
+                    }
                   },
                   child: Text(
-                    offers[index].isRunning ? 'View' : 'CLAIM NOW',
-                    style: TextStyle(color: Theme.of(context).primaryColor),
+                    myActiveFlights.length - 1 >= index ? 'VIEW' : 'CLAIN NOW',
+                    style: TextStyle(
+                        color: myActiveFlights.length - 1 >= index
+                            ? Theme.of(context).accentColor
+                            : Theme.of(context).primaryColor),
                   )),
             ),
           ],
