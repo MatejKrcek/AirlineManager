@@ -8,6 +8,11 @@ import '../models/offer.dart';
 import '../widgets/offers.dart';
 import '../models/myFlights.dart';
 
+enum FilterOptions {
+  Favorites,
+  All,
+}
+
 class OffersOverviewScreen extends StatefulWidget {
   static const routeName = '/offers-screen';
 
@@ -26,6 +31,7 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
   List<MyFlights> myActiveFlights = [];
   bool isLoading = false;
   bool isLoadingOther = false;
+  var _showOnFlight = false;
 
   Future getFlights() async {
     setState(() {
@@ -144,10 +150,37 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Flight Offers'),
+        actions: <Widget>[
+          PopupMenuButton(
+            tooltip: 'Show Filters',
+            onSelected: (FilterOptions selectedValue) {
+              setState(() {
+                if (selectedValue == FilterOptions.Favorites) {
+                  _showOnFlight = true;
+                } else {
+                  _showOnFlight = false;
+                }
+              });
+            },
+            icon: Icon(
+              Icons.more_vert,
+            ),
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                child: Text('Only On Flight'),
+                value: FilterOptions.Favorites,
+              ),
+              PopupMenuItem(
+                child: Text('Show All'),
+                value: FilterOptions.All,
+              ),
+            ],
+          ),
+        ],
       ),
       drawer: AppDrawer(),
       body: !isLoading && !isLoadingOther
-          ? Offers(myFlights, myActiveFlights)
+          ? Offers(myFlights, myActiveFlights, _showOnFlight)
           : Center(
               child: CircularProgressIndicator(),
             ),

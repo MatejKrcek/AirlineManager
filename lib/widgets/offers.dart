@@ -7,25 +7,30 @@ import '../models/offer.dart';
 class Offers extends StatelessWidget {
   final List<Offer> flights;
   final List<MyFlights> myActiveFlights;
+  final bool onFlight;
 
-  Offers(this.flights, this.myActiveFlights);
+  Offers(this.flights, this.myActiveFlights, this.onFlight);
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: flights.length,
+      itemCount: onFlight ? myActiveFlights.length : flights.length,
       itemBuilder: (context, index) => Card(
         elevation: 5,
         margin: EdgeInsets.all(10),
         child: Column(
           children: <Widget>[
             ListTile(
-              title: Text(myActiveFlights.length - 1 >= index
+              title: Text(onFlight
                   ? '${myActiveFlights[index].departureDes} -> ${myActiveFlights[index].arrivalDes}'
-                  : '${flights[index].departureDes} -> ${flights[index].arrivalDes}'),
-              subtitle: Text(myActiveFlights.length - 1 >= index
+                  : myActiveFlights.length - 1 >= index
+                      ? '${myActiveFlights[index].departureDes} -> ${myActiveFlights[index].arrivalDes}'
+                      : '${flights[index].departureDes} -> ${flights[index].arrivalDes}'),
+              subtitle: Text(onFlight
                   ? 'Reward: ${myActiveFlights[index].reward.toString()} coins'
-                  : 'Reward: ${flights[index].price.toString()} coins'),
+                  : myActiveFlights.length - 1 >= index
+                      ? 'Reward: ${myActiveFlights[index].reward.toString()} coins'
+                      : 'Reward: ${flights[index].price.toString()} coins'),
               trailing: FlatButton(
                   onPressed: () {
                     if (myActiveFlights.length - 1 >= index) {
@@ -35,8 +40,7 @@ class Offers extends StatelessWidget {
                                 myActiveFlights[i].departureDes &&
                             flights[i].arrivalDes ==
                                 myActiveFlights[i].arrivalDes &&
-                            flights[i].price ==
-                                myActiveFlights[i].reward) {
+                            flights[i].price == myActiveFlights[i].reward) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
