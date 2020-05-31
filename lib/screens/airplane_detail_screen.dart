@@ -33,8 +33,8 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
       myPlanes = [];
     });
 
-    const url =
-        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=0d865038-de6d-4d50-9728-37a415ad8bdd';
+    var url =
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=${User.uid}';
 
     try {
       var response = await http.get(url);
@@ -71,7 +71,7 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
 
         final List<User> newUser = [
           User(
-            id: "0d865038-de6d-4d50-9728-37a415ad8bdd",
+            id: User.uid,
             username: map['name'],
             airlineName: map['airlineName'],
             coins: map['coins'],
@@ -103,7 +103,7 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
 
   Future sell() async {
     var url =
-        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/sellAircraft?personId=0d865038-de6d-4d50-9728-37a415ad8bdd&aircraftIdentity=${myPlanes[widget.index].id}';
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/sellAircraft?personId=${User.uid}&aircraftIdentity=${myPlanes[widget.index].id}';
 
     try {
       var response = await http.get(url);

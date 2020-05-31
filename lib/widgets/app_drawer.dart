@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -47,6 +48,14 @@ class AppDrawer extends StatelessWidget {
             title: Text('Statistics'),
             onTap: () {
               Navigator.of(context).pushReplacementNamed('/stats-screen');
+            },
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.exit_to_app),
+            title: Text('Logout'),
+            onTap: () {
+              FirebaseAuth.instance.signOut();
             },
           ),
         ],

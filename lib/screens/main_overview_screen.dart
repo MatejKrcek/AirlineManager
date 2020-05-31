@@ -23,6 +23,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
   int countFlights = 0;
 
   Future getData() async {
+    print(User.uid);
     setState(() {
       isLoading = true;
       countPlanes = 0;
@@ -31,11 +32,14 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
       myPlanes = [];
     });
 
-    const url =
+    var url =
         'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=0d865038-de6d-4d50-9728-37a415ad8bdd';
 
+    var url2 =
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=${User.uid}';
+
     try {
-      var response = await http.get(url);
+      var response = await http.get(url2);
 
       if (response.statusCode == 200) {
         Map<String, dynamic> map = convert.jsonDecode(response.body);
@@ -66,30 +70,32 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
         }
         countPlanes = myPlanes.length - 1;
 
-        var flights = map['flights'];
-        for (var item in flights.keys) {
-          List<MyFlights> prepsFlights = [
-            MyFlights(
-              id: item,
-              arrivalDes: flights[item]['arrivalDes'],
-              departureDes: flights[item]['departureDes'],
-              aircraft: flights[item]['aircraft'],
-              departureTime: flights[item]['departureTime'],
-              reward: flights[item]['reward'],
-              onAir: flights[item]['onAir'],
-              flightNumber: flights[item]['flightNo'],
-              flightTime: flights[item]['flightTime'],
-            ),
-          ];
-          myFlights.add(prepsFlights[0]);
+        if (map['flights'] != null) {
+          var flights = map['flights'];
+          for (var item in flights.keys) {
+            List<MyFlights> prepsFlights = [
+              MyFlights(
+                id: item,
+                arrivalDes: flights[item]['arrivalDes'],
+                departureDes: flights[item]['departureDes'],
+                aircraft: flights[item]['aircraft'],
+                departureTime: flights[item]['departureTime'],
+                reward: flights[item]['reward'],
+                onAir: flights[item]['onAir'],
+                flightNumber: flights[item]['flightNo'],
+                flightTime: flights[item]['flightTime'],
+              ),
+            ];
+            myFlights.add(prepsFlights[0]);
+          }
+          // print(myFlights[countFlights].departureDes);
+          countFlights = myFlights.length - 1;
+          // print(myFlights[countFlights].departureDes);
         }
-        // print(myFlights[countFlights].departureDes);
-        countFlights = myFlights.length - 1;
-        // print(myFlights[countFlights].departureDes);
 
         final List<User> newUser = [
           User(
-            id: "0d865038-de6d-4d50-9728-37a415ad8bdd",
+            id: User.uid,
             username: map['name'],
             airlineName: map['airlineName'],
             coins: map['coins'],
@@ -106,7 +112,6 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
           ),
         ];
         user.add(newUser[0]);
-        print(countPlanes);
         setState(() {
           isLoading = false;
         });
@@ -187,22 +192,26 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                     SizedBox(
                       height: 150,
                       child: !isLoading
-                          ? ListView.builder(
-                              itemCount: countFlights + 1,
-                              itemBuilder: (context, index) => ListTile(
-                                title: Text(
-                                  isLoading
-                                      ? 'Loading...'
-                                      : '${myFlights[index].departureDes} -> ${myFlights[index].arrivalDes}',
-                                  style: TextStyle(fontSize: 15),
-                                ),
-                                subtitle: Text(isLoading
-                                    ? 'Loading...'
-                                    : 'Claim ${myFlights[index].reward.toString()} coins now!'),
-                              ),
-                            )
+                          ? myFlights.length != 0
+                              ? ListView.builder(
+                                  itemCount: countFlights + 1,
+                                  itemBuilder: (context, index) => ListTile(
+                                    title: Text(
+                                      isLoading
+                                          ? 'Loading...'
+                                          : '${myFlights[index].departureDes} -> ${myFlights[index].arrivalDes}',
+                                      style: TextStyle(fontSize: 15),
+                                    ),
+                                    subtitle: Text(isLoading
+                                        ? 'Loading...'
+                                        : 'Claim ${myFlights[index].reward.toString()} coins now!'),
+                                  ),
+                                )
+                              : const Center(
+                                  child: const Text('Hey! Claim a offer!'),
+                                )
                           : const Center(
-                              child: const CircularProgressIndicator(),
+                              child: CircularProgressIndicator(),
                             ),
                     ),
                   ],
@@ -230,10 +239,10 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                       ),
                     ),
                     SizedBox(
-                      height: countPlanes == 0 ? 100 : 235,
+                      height: myPlanes.length == 0 ? 100 : 235,
                       child: Container(
                         height: 230,
-                        child: countPlanes == 0
+                        child: myPlanes.length == 0
                             ? Center(
                                 child: Text(
                                     'Hey! You have no airplane! Visit shop!'))

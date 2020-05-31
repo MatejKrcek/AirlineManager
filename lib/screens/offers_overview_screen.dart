@@ -7,6 +7,7 @@ import '../widgets/app_drawer.dart';
 import '../models/offer.dart';
 import '../widgets/offers.dart';
 import '../models/myFlights.dart';
+import '../models/user.dart';
 
 enum FilterOptions {
   Favorites,
@@ -92,8 +93,8 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
       myActiveFlights = [];
     });
 
-    const url =
-        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=0d865038-de6d-4d50-9728-37a415ad8bdd';
+    var url =
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=${User.uid}';
 
     try {
       var response = await http.get(url);
@@ -104,22 +105,24 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
           return;
         }
 
-        var flights = map['flights'];
-        for (var item in flights.keys) {
-          List<MyFlights> prepsFlights = [
-            MyFlights(
-              id: item,
-              arrivalDes: flights[item]['arrivalDes'],
-              departureDes: flights[item]['departureDes'],
-              aircraft: flights[item]['aircraft'],
-              departureTime: flights[item]['departureTime'],
-              reward: flights[item]['reward'],
-              onAir: flights[item]['onAir'],
-              flightNumber: flights[item]['flightNo'],
-              flightTime: flights[item]['flightTime'],
-            ),
-          ];
-          myActiveFlights.add(prepsFlights[0]);
+        if (map['flights'] != null) {
+          var flights = map['flights'];
+          for (var item in flights.keys) {
+            List<MyFlights> prepsFlights = [
+              MyFlights(
+                id: item,
+                arrivalDes: flights[item]['arrivalDes'],
+                departureDes: flights[item]['departureDes'],
+                aircraft: flights[item]['aircraft'],
+                departureTime: flights[item]['departureTime'],
+                reward: flights[item]['reward'],
+                onAir: flights[item]['onAir'],
+                flightNumber: flights[item]['flightNo'],
+                flightTime: flights[item]['flightTime'],
+              ),
+            ];
+            myActiveFlights.add(prepsFlights[0]);
+          }
         }
         // print(myFlights[countFlights].departureDes);
         print(myActiveFlights.length);

@@ -17,6 +17,7 @@ class ShopScreen extends StatefulWidget {
 class _ShopScreenState extends State<ShopScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   bool isLoading = false;
+  bool isLoadingOther = false;
 
   final List<User> user = [];
   final List<Airplane> listOfAirplanes = [];
@@ -28,8 +29,8 @@ class _ShopScreenState extends State<ShopScreen> {
       countPlanes = 0;
     });
 
-    const url =
-        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=0d865038-de6d-4d50-9728-37a415ad8bdd';
+    var url =
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=${User.uid}';
 
     try {
       var response = await http.get(url);
@@ -43,7 +44,7 @@ class _ShopScreenState extends State<ShopScreen> {
 
         final List<User> newUser = [
           User(
-            id: "0d865038-de6d-4d50-9728-37a415ad8bdd",
+            id: User.uid,
             username: map['name'],
             airlineName: map['airlineName'],
             coins: map['coins'],
@@ -75,7 +76,7 @@ class _ShopScreenState extends State<ShopScreen> {
 
   Future getAirlanes() async {
     setState(() {
-      isLoading = true;
+      isLoadingOther = true;
     });
     const url =
         'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=aircrafts';
@@ -108,7 +109,7 @@ class _ShopScreenState extends State<ShopScreen> {
           });
         }
         setState(() {
-          isLoading = false;
+          isLoadingOther = false;
         });
 
         listOfAirplanes.sort((a, b) => a.name.compareTo(b.name));
@@ -116,7 +117,7 @@ class _ShopScreenState extends State<ShopScreen> {
       } else {
         print('error');
         setState(() {
-          isLoading = false;
+          isLoadingOther = false;
         });
       }
     } catch (error) {
@@ -140,7 +141,7 @@ class _ShopScreenState extends State<ShopScreen> {
 
         final List<User> newUser = [
           User(
-            id: "0d865038-de6d-4d50-9728-37a415ad8bdd",
+            id: User.uid,
             username: map['name'],
             airlineName: map['airlineName'],
             coins: map['coins'],
@@ -189,6 +190,7 @@ class _ShopScreenState extends State<ShopScreen> {
         content: Text('Congrats! Check your inventory'),
         backgroundColor: Theme.of(context).primaryColor,
       ));
+      getData();
     } else {
       print('Not enought coins');
       _scaffoldKey.currentState.showSnackBar(SnackBar(
@@ -266,142 +268,153 @@ class _ShopScreenState extends State<ShopScreen> {
         title: Text('Shop'),
       ),
       drawer: AppDrawer(),
-      body: RefreshIndicator(
-        onRefresh: () => getData(),
-        child: Center(
-          child: Column(
-            children: <Widget>[
-              Card(
-                elevation: 5,
-                child: ListTile(
-                  title: Text(isLoading
-                      ? 'Loading...'
-                      : 'Coins: ${user[0].coins.toString()}'),
-                ),
-              ),
-              Card(
-                elevation: 5,
-                margin: const EdgeInsets.all(10),
+      body: !isLoading && !isLoadingOther
+          ? RefreshIndicator(
+              onRefresh: () => getData(),
+              child: Center(
                 child: Column(
                   children: <Widget>[
-                    ListTile(
-                      title: Text(
-                        'Airplanes',
+                    Card(
+                      elevation: 5,
+                      child: ListTile(
+                        title: Text(isLoading
+                            ? 'Loading...'
+                            : 'Coins: ${user[0].coins.toString()}'),
                       ),
                     ),
-                    SizedBox(
-                      height: 280,
-                      child: Container(
-                        child: isLoading
-                            ? Center(
-                                child: CircularProgressIndicator(),
-                              )
-                            : ListView.builder(
-                                itemCount: listOfAirplanes.length,
-                                scrollDirection: Axis.horizontal,
-                                itemBuilder: (context, index) => Container(
-                                  margin: EdgeInsets.only(right: 10),
-                                  width: 160,
-                                  child: Column(
-                                    children: <Widget>[
-                                      Container(
+                    Card(
+                      elevation: 5,
+                      margin: const EdgeInsets.all(10),
+                      child: Column(
+                        children: <Widget>[
+                          ListTile(
+                            title: Text(
+                              'Airplanes',
+                            ),
+                          ),
+                          SizedBox(
+                            height: 280,
+                            child: Container(
+                              child: isLoading
+                                  ? Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : ListView.builder(
+                                      itemCount: listOfAirplanes.length,
+                                      scrollDirection: Axis.horizontal,
+                                      itemBuilder: (context, index) =>
+                                          Container(
+                                        margin: EdgeInsets.only(right: 10),
                                         width: 160,
-                                        height: 100,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: Colors.grey,
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: Image.network(
-                                            listOfAirplanes[index].imageUrl,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Text(
-                                        listOfAirplanes[index].name,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Row(
-                                        children: <Widget>[
-                                          Container(
-                                            margin: EdgeInsets.only(left: 10),
-                                            child: Text(
-                                              'Range: ${listOfAirplanes[index].distance.toString()} km',
-                                              textAlign: TextAlign.left,
+                                        child: Column(
+                                          children: <Widget>[
+                                            Container(
+                                              width: 160,
+                                              height: 100,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.grey,
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                child: Image.network(
+                                                  listOfAirplanes[index]
+                                                      .imageUrl,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: <Widget>[
-                                          Container(
-                                            margin: EdgeInsets.only(left: 10),
-                                            child: Text(
-                                              'Seats: ${listOfAirplanes[index].seats.toString()}',
-                                              textAlign: TextAlign.left,
+                                            SizedBox(
+                                              height: 10,
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: <Widget>[
-                                          Container(
-                                            margin: EdgeInsets.only(left: 10),
-                                            child: Text(
-                                              'Speed: ${listOfAirplanes[index].speed.toString()}',
-                                              textAlign: TextAlign.left,
+                                            Text(
+                                              listOfAirplanes[index].name,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Text(
-                                        '${listOfAirplanes[index].price.toString()} coins',
-                                      ),
-                                      FlatButton(
-                                        onPressed: user[0].coins <
-                                                listOfAirplanes[index].price
-                                            ? null
-                                            : () {
-                                                _showDialog(index);
-                                              },
-                                        child: Text(
-                                          'Buy now',
-                                          style: TextStyle(
-                                            color: user[0].coins <
-                                                    listOfAirplanes[index].price
-                                                ? Colors.grey
-                                                : Theme.of(context)
-                                                    .primaryColor,
-                                          ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              children: <Widget>[
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 10),
+                                                  child: Text(
+                                                    'Range: ${listOfAirplanes[index].distance.toString()} km',
+                                                    textAlign: TextAlign.left,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: <Widget>[
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 10),
+                                                  child: Text(
+                                                    'Seats: ${listOfAirplanes[index].seats.toString()}',
+                                                    textAlign: TextAlign.left,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: <Widget>[
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 10),
+                                                  child: Text(
+                                                    'Speed: ${listOfAirplanes[index].speed.toString()}',
+                                                    textAlign: TextAlign.left,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Text(
+                                              '${listOfAirplanes[index].price.toString()} coins',
+                                            ),
+                                            FlatButton(
+                                              onPressed: user[0].coins <
+                                                      listOfAirplanes[index]
+                                                          .price
+                                                  ? null
+                                                  : () {
+                                                      _showDialog(index);
+                                                    },
+                                              child: Text(
+                                                'Buy now',
+                                                style: TextStyle(
+                                                  color: user[0].coins <
+                                                          listOfAirplanes[index]
+                                                              .price
+                                                      ? Colors.grey
+                                                      : Theme.of(context)
+                                                          .primaryColor,
+                                                ),
+                                              ),
+                                            )
+                                          ],
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            )
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 }

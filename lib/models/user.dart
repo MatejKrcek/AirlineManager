@@ -4,6 +4,7 @@ import './myAirplanes.dart';
 import './myFlights.dart';
 
 class User {
+  static String uid;
   String id;
   String username;
   String airlineName;
@@ -20,21 +21,19 @@ class User {
   MyFlights flights;
 
   User({
-    @required this.id,
-    @required this.username,
-    @required this.airlineName,
-    @required this.coins,
-    @required this.gems,
-    @required this.pilotRank,
-    @required this.gameLevel,
-    @required this.profilePictureUrl,
-    @required this.created,
-    @required this.login,
-    @required this.totalFlightDistance,
-    @required this.totalFlightTime,
+    this.id,
+    this.username,
+    this.airlineName,
+    this.coins,
+    this.gems,
+    this.pilotRank,
+    this.gameLevel,
+    this.profilePictureUrl,
+    this.created,
+    this.login,
+    this.totalFlightDistance,
+    this.totalFlightTime,
     this.aircrafts,
     this.flights,
   });
-
-  static fromJson(decode) {}
-}
+} 

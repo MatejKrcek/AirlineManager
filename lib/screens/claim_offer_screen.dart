@@ -38,8 +38,8 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
       myFlights = [];
     });
 
-    const url =
-        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=0d865038-de6d-4d50-9728-37a415ad8bdd';
+    var url =
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=${User.uid}';
 
     try {
       var response = await http.get(url);
@@ -93,7 +93,7 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
 
         final List<User> newUser = [
           User(
-            id: "0d865038-de6d-4d50-9728-37a415ad8bdd",
+            id: User.uid,
             username: map['name'],
             airlineName: map['airlineName'],
             coins: map['coins'],

@@ -9,6 +9,7 @@ import 'dart:io';
 import 'dart:math';
 
 import '../widgets/auth_form.dart';
+import '../models/user.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -39,8 +40,9 @@ class _AuthScreenState extends State<AuthScreen> {
           email: email,
           password: password,
         );
-        // FirebaseUser user = authResult.user;
-        // return user.uid;
+        String myId = authResult.user.uid;
+        User.uid = myId;
+        print(User.uid);
 
       } else {
         authResult = await _auth.createUserWithEmailAndPassword(
@@ -49,32 +51,15 @@ class _AuthScreenState extends State<AuthScreen> {
         );
 
         var url =
-            'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/personCreate?personId=${authResult.user.uid}';
+            'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/personCreate?personId=${authResult.user.uid}&personName=$username';
 
         await http.get(url);
 
+        String myId = authResult.user.uid;
+        User.uid = myId;
+        print(User.uid);
+
         print('done');
-
-        // FirebaseUser user = authResult.user;
-        // return user.uid;
-
-        // final ref = FirebaseStorage.instance
-        //     .ref()
-        //     .child('user_image')
-        //     .child(authResult.user.uid + '.jpg');
-
-        // await ref.putFile(image).onComplete;
-
-        // final url = await ref.getDownloadURL();
-
-        // await Firestore.instance
-        //     .collection('users')
-        //     .document(authResult.user.uid)
-        //     .setData({
-        //   'username': username,
-        //   'email': email,
-        //   'image_url': url,
-        // });
       }
     } on PlatformException catch (err) {
       var message = 'An error occurred, pelase check your credentials!';
