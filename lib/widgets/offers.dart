@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kiwi/screens/flight_screen.dart';
+
+import '../screens/claim_offer_screen.dart';
 
 import '../models/myFlights.dart';
 import '../models/offer.dart';
@@ -35,7 +36,6 @@ class Offers extends StatelessWidget {
                   onPressed: () {
                     if (myActiveFlights.length - 1 >= index) {
                       for (var i = 0; i <= index - i; i++) {
-                        print('cau');
                         if (flights[i].departureDes ==
                                 myActiveFlights[i].departureDes &&
                             flights[i].arrivalDes ==
@@ -45,16 +45,15 @@ class Offers extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    FlightScreen(true, index)),
+                                    ClaimOfferScreen(true, index)),
                           );
                         }
                       }
                     } else {
-                      print('asss');
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => FlightScreen(false, index)),
+                            builder: (context) => ClaimOfferScreen(false, index)),
                       );
                     }
                   },

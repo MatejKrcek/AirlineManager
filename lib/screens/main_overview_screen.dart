@@ -5,8 +5,6 @@ import 'package:http/http.dart' as http;
 
 import '../widgets/app_drawer.dart';
 import '../models/user.dart';
-import '../models/airplane.dart';
-import '../models/offer.dart';
 import '../models/myAirplanes.dart';
 import '../models/myFlights.dart';
 

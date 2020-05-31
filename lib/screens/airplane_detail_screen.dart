@@ -153,7 +153,7 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
                   style: TextStyle(fontWeight: FontWeight.normal),
                 ),
                 TextSpan(
-                  text: myPlanes[index].price.toString(),
+                  text: (myPlanes[index].price * 0.9).round().toString(),
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextSpan(

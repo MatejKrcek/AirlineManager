@@ -33,7 +33,6 @@ class MyApp extends StatelessWidget {
             if (userSnapshot.hasData) {
               return MainOverviewScreen();
             }
-
             return AuthScreen();
           }),
       routes: {
@@ -41,7 +40,6 @@ class MyApp extends StatelessWidget {
         InventoryScreen.routeName: (ctx) => InventoryScreen(),
         ShopScreen.routeName: (ctx) => ShopScreen(),
         StatsScreen.routeName: (ctx) => StatsScreen(),
-        //FlightScreen.routeName: (ctx) => FlightScreen(false, 0),
       },
     );
   }

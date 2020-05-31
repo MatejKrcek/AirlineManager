@@ -10,7 +10,6 @@ class AppDrawer extends StatelessWidget {
             title: Text('Airline Manager'),
             automaticallyImplyLeading: false,
           ),
-          Divider(),
           ListTile(
             leading: Icon(Icons.insert_chart),
             title: Text('Overview'),
