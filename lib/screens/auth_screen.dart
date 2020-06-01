@@ -28,6 +28,7 @@ class _AuthScreenState extends State<AuthScreen> {
     bool isLogin,
     BuildContext ctx,
   ) async {
+    
     print('start');
     AuthResult authResult;
 

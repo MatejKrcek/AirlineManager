@@ -7,6 +7,7 @@ import '../widgets/app_drawer.dart';
 import '../models/user.dart';
 import '../models/myAirplanes.dart';
 import '../models/myFlights.dart';
+import '../models/offer.dart';
 
 class MainOverviewScreen extends StatefulWidget {
   @override
@@ -19,8 +20,11 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
   final List<User> user = [];
   List<MyFlights> myFlights = [];
   List<MyAirplane> myPlanes = [];
+  List<MyFlights> myActiveFlights = [];
+  List<Offer> offers = [];
   int countPlanes = 0;
   int countFlights = 0;
+  bool isLoadingOther = false;
 
   Future getData() async {
     print(User.uid);
@@ -30,6 +34,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
       countFlights = 0;
       myFlights = [];
       myPlanes = [];
+      myActiveFlights = [];
     });
 
     var url =
@@ -72,6 +77,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
 
         if (map['flights'] != null) {
           var flights = map['flights'];
+          int i = 0;
           for (var item in flights.keys) {
             List<MyFlights> prepsFlights = [
               MyFlights(
@@ -84,9 +90,22 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                 onAir: flights[item]['onAir'],
                 flightNumber: flights[item]['flightNo'],
                 flightTime: flights[item]['flightTime'],
+                arrivalTime: flights[item]['arrivalTime'],
               ),
             ];
             myFlights.add(prepsFlights[0]);
+            
+            if (DateTime.parse(myFlights[i].arrivalTime)
+                .isAfter(DateTime.now())) {
+              print('future');
+              myActiveFlights.add(myFlights[i]);
+              myFlights[0].onAir = true;
+            } else {
+              myFlights[0].onAir = false;
+              //myActiveFlights.removeAt(0);
+              print('done');
+            }
+            i++;
           }
           // print(myFlights[countFlights].departureDes);
           countFlights = myFlights.length - 1;
@@ -190,21 +209,19 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                       color: Colors.grey,
                     ),
                     SizedBox(
-                      height: myFlights.length == 0 ? 100 : 150,
+                      height: myActiveFlights.length == 0 ? 100 : 150,
                       child: !isLoading
-                          ? myFlights.length != 0
+                          ? myActiveFlights.length != 0
                               ? ListView.builder(
-                                  itemCount: countFlights + 1,
+                                  itemCount: myActiveFlights.length,
                                   itemBuilder: (context, index) => ListTile(
                                     title: Text(
                                       isLoading
                                           ? 'Loading...'
-                                          : '${myFlights[index].departureDes} -> ${myFlights[index].arrivalDes}',
+                                          : '${myActiveFlights[index].departureDes} -> ${myActiveFlights[index].arrivalDes}',
                                       style: TextStyle(fontSize: 15),
                                     ),
-                                    subtitle: Text(isLoading
-                                        ? 'Loading...'
-                                        : 'Claim ${myFlights[index].reward.toString()} coins now!'),
+                                    subtitle: Text('Arive at: ${myActiveFlights[index].arrivalTime}'),
                                   ),
                                 )
                               : const Center(
@@ -313,16 +330,16 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                       SizedBox(
                                         height: 10,
                                       ),
-                                      Text(
-                                        myPlanes[index].onFlight == ""
-                                            ? 'Available'
-                                            : 'On Flight',
-                                        style: TextStyle(
-                                          color: myPlanes[index].onFlight == ""
-                                              ? Colors.green
-                                              : Colors.red,
-                                        ),
-                                      ),
+                                      // Text(
+                                      //   myPlanes[index].onFlight == ""
+                                      //       ? 'Available'
+                                      //       : 'On Flight',
+                                      //   style: TextStyle(
+                                      //     color: myPlanes[index].onFlight == ""
+                                      //         ? Colors.green
+                                      //         : Colors.red,
+                                      //   ),
+                                      // ),
                                     ],
                                   ),
                                 ),

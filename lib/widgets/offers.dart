@@ -9,15 +9,21 @@ class Offers extends StatelessWidget {
   final List<Offer> flights;
   final List<MyFlights> myActiveFlights;
   final bool onFlight;
+  final List<MyFlights> myRunningFlights;
 
-  Offers(this.flights, this.myActiveFlights, this.onFlight);
+  Offers(
+    this.flights,
+    this.myActiveFlights,
+    this.onFlight,
+    this.myRunningFlights,
+  );
 
   @override
   Widget build(BuildContext context) {
-    return myActiveFlights.length == 0 && onFlight
+    return myRunningFlights.length == 0 && onFlight
         ? Center(child: Text('Quite empty, isn\'t it? Maybe check filters.'))
         : ListView.builder(
-            itemCount: onFlight ? myActiveFlights.length : flights.length,
+            itemCount: onFlight ? myRunningFlights.length : flights.length,
             itemBuilder: (context, index) => Card(
               elevation: 5,
               margin: EdgeInsets.all(10),
@@ -25,33 +31,38 @@ class Offers extends StatelessWidget {
                 children: <Widget>[
                   ListTile(
                     title: Text(onFlight
-                        ? '${myActiveFlights[index].departureDes} -> ${myActiveFlights[index].arrivalDes}'
-                        : myActiveFlights.length - 1 >= index
-                            ? '${myActiveFlights[index].departureDes} -> ${myActiveFlights[index].arrivalDes}'
-                            : '${flights[index].departureDes} -> ${flights[index].arrivalDes}'),
+                        ? '${myRunningFlights[index].departureDes} -> ${myRunningFlights[index].arrivalDes}'
+                        : '${flights[index].departureDes} -> ${flights[index].arrivalDes}'),
                     subtitle: Text(onFlight
-                        ? 'Reward: ${myActiveFlights[index].reward.toString()} coins'
-                        : myActiveFlights.length - 1 >= index
-                            ? 'Reward: ${myActiveFlights[index].reward.toString()} coins'
-                            : 'Reward: ${flights[index].price.toString()} coins'),
+                        ? 'Reward: ${myRunningFlights[index].reward.toString()} coins'
+                        : 'Reward: ${flights[index].price.toString()} coins'),
                     trailing: FlatButton(
                         onPressed: () {
-                          if (myActiveFlights.length - 1 >= index) {
-                            for (var i = 0; i <= index - i; i++) {
-                              if (flights[i].departureDes ==
-                                      myActiveFlights[i].departureDes &&
-                                  flights[i].arrivalDes ==
-                                      myActiveFlights[i].arrivalDes &&
-                                  flights[i].price ==
-                                      myActiveFlights[i].reward) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          ClaimOfferScreen(true, index)),
-                                );
-                              }
-                            }
+                          // if (myActiveFlights.length - 1 >= index) {
+                          // for (var i = 0; i <= index - i; i++) {
+                          //   if (flights[i].departureDes ==
+                          //           myActiveFlights[i].departureDes &&
+                          //       flights[i].arrivalDes ==
+                          //           myActiveFlights[i].arrivalDes &&
+                          //       flights[i].price ==
+                          //           myActiveFlights[i].reward) {
+                          //     Navigator.push(
+                          //       context,
+                          //       MaterialPageRoute(
+                          //           builder: (context) =>
+                          //               ClaimOfferScreen(true, index)),
+                          //     );
+                          //   }
+                          // }
+
+                          // }
+                          if (onFlight) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ClaimOfferScreen(true, index)),
+                            );
                           } else {
                             Navigator.push(
                               context,
@@ -62,11 +73,9 @@ class Offers extends StatelessWidget {
                           }
                         },
                         child: Text(
-                          myActiveFlights.length - 1 >= index
-                              ? 'VIEW'
-                              : 'CLAIM NOW',
+                          onFlight ? 'VIEW' : 'CLAIM NOW',
                           style: TextStyle(
-                              color: myActiveFlights.length - 1 >= index
+                              color: onFlight
                                   ? Theme.of(context).accentColor
                                   : Theme.of(context).primaryColor),
                         )),

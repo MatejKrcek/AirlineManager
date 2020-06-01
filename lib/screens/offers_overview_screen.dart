@@ -32,6 +32,7 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
   List<MyFlights> myActiveFlights = [];
   bool isLoading = false;
   bool isLoadingOther = false;
+  List<MyFlights> myRunningFlights = [];
   var _showOnFlight = false;
 
   Future getFlights() async {
@@ -72,7 +73,7 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
           });
         }
         print(myFlights.length);
-
+        print('2');
         setState(() {
           isLoadingOther = false;
         });
@@ -90,6 +91,7 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
   Future getMyFlights() async {
     setState(() {
       isLoading = true;
+      myActiveFlights = [];
       myActiveFlights = [];
     });
 
@@ -127,17 +129,18 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
             if (DateTime.parse(myActiveFlights[0].arrivalTime)
                 .isAfter(DateTime.now())) {
               print('future');
+
               myActiveFlights[0].onAir = true;
+              myRunningFlights.add(myActiveFlights[0]);
             } else {
               myActiveFlights[0].onAir = false;
-              // myActiveFlights.removeAt(0);
+              //myActiveFlights.removeAt(0);
               print('done');
             }
-
-            
           }
         }
-
+        print('LENGHT');
+        print(myRunningFlights.length);
         setState(() {
           isLoading = false;
         });
@@ -186,7 +189,7 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
                 value: FilterOptions.Favorites,
               ),
               PopupMenuItem(
-                child: Text('Show All'),
+                child: Text('Show All Available'),
                 value: FilterOptions.All,
               ),
             ],
@@ -194,8 +197,8 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
         ],
       ),
       drawer: AppDrawer(),
-      body: !isLoading && !isLoadingOther
-          ? Offers(myFlights, myActiveFlights, _showOnFlight)
+      body: !isLoading || !isLoadingOther
+          ? Offers(myFlights, myActiveFlights, _showOnFlight, myRunningFlights)
           : Center(
               child: CircularProgressIndicator(),
             ),

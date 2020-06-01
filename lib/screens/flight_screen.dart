@@ -215,18 +215,18 @@ class _FlightScreenState extends State<FlightScreen> {
 
       }
 
-      // countdown = new Timer.periodic(
-      //   oneSec,
-      //   (Timer timer) => setState(
-      //     () {
-      //       if (timeLeft < 1) {
-      //         timer.cancel();
-      //       } else {
-      //         timeLeft = timeLeft - 1;
-      //       }
-      //     },
-      //   ),
-      // );
+      countdown = new Timer.periodic(
+        oneSec,
+        (Timer timer) => setState(
+          () {
+            if (timeLeft < 1) {
+              timer.cancel();
+            } else {
+              timeLeft = timeLeft - 1;
+            }
+          },
+        ),
+      );
     }
   }
 
