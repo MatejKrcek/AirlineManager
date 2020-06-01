@@ -10,6 +10,11 @@ class MyFlights {
   String flightNumber;
   int reward;
   int flightTime;
+  String arrivalTime;
+  String arrivalId;
+  String departureId;
+  int range;
+  int minCapacity;
 
   MyFlights({
     @required this.id,
@@ -21,5 +26,10 @@ class MyFlights {
     @required this.departureTime,
     @required this.reward,
     @required this.flightTime,
+    this.arrivalTime,
+    this.range,
+    this.arrivalId,
+    this.departureId,
+    this.minCapacity,
   });
 }

@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
+import 'dart:async';
 
 import './select_plane_screen.dart';
 import '../models/user.dart';
@@ -31,6 +34,10 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
   bool isLoading = false;
   bool isLoadingOther = false;
   int position = 0;
+
+  double progress = 0.2;
+  String status = 'Departuring';
+  Timer timer;
 
   Future getData() async {
     setState(() {
@@ -86,9 +93,23 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
               onAir: flights[item]['onAir'],
               flightNumber: flights[item]['flightNo'],
               flightTime: flights[item]['flightTime'],
+              arrivalTime: flights[item]['arrivalTime'],
+              arrivalId: flights[item]['arrivalId'],
+              departureId: flights[item]['departureId'],
+              range: flights[item]['range'],
+              minCapacity: flights[item]['minCapacity'],
             ),
           ];
           myFlights.add(prepsFlights[0]);
+          if (DateTime.parse(myFlights[0].arrivalTime)
+              .isAfter(DateTime.now())) {
+            print('future');
+            myFlights[0].onAir = true;
+          } else {
+            myFlights[0].onAir = false;
+            // myActiveFlights.removeAt(0);
+            print('done');
+          }
         }
 
         final List<User> newUser = [
@@ -111,6 +132,7 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
         setState(() {
           isLoading = false;
         });
+        setup();
       } else {
         print('error');
         setState(() {
@@ -175,13 +197,6 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    getData();
-    getFlights();
-  }
-
   _navigate() async {
     final result = await Navigator.push(
       context,
@@ -192,6 +207,41 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
     setState(() {
       position = result;
     });
+  }
+
+  void setup() {
+    if (myFlights[widget.index].onAir) {
+      DateTime arrival = DateTime.parse(myFlights[widget.index].arrivalTime);
+      Duration difference = arrival.difference(DateTime.now());
+      print(difference);
+
+      setState(() {
+        status = 'On Flight';
+        progress = 1 /
+            (double.parse(myFlights[widget.index].arrivalTime.toString()) * 60);
+      });
+      print(progress);
+      //zavolat Timer
+    }
+    setState(() {
+      progress = 1;
+      status = 'Arrival';
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    // timer?.cancel();
+    // countdown.cancel();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+    getFlights();
+    // timer = Timer.periodic(Duration(seconds: 1), (Timer t) => update());
   }
 
   @override
@@ -287,20 +337,21 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
                                   children: <TextSpan>[
                                     TextSpan(
                                       text: widget.isClaimed
-                                          ? myPlanes[widget.index]
-                                              .seats
+                                          ? myFlights[widget.index]
+                                              .minCapacity
                                               .toString()
                                           : allFlights[widget.index]
                                               .minCapacity
                                               .toString(),
                                       style: TextStyle(
-                                          color: myPlanes[position].seats >=
-                                                  allFlights[widget.index]
-                                                      .minCapacity
-                                              ? Colors.black
-                                              : Colors.red,
+                                          color:
+                                              myFlights[position].minCapacity >=
+                                                      allFlights[widget.index]
+                                                          .minCapacity
+                                                  ? Colors.black
+                                                  : Colors.red,
                                           fontWeight:
-                                              myPlanes[position].seats >=
+                                              myFlights[position].minCapacity >=
                                                       allFlights[widget.index]
                                                           .minCapacity
                                                   ? FontWeight.normal
@@ -334,17 +385,19 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
                                   children: <TextSpan>[
                                     TextSpan(
                                       text: widget.isClaimed
-                                          ? 'XXX'
+                                          ? myFlights[widget.index]
+                                              .range
+                                              .toString()
                                           : allFlights[widget.index]
                                               .range
                                               .toString(),
                                       style: TextStyle(
-                                          color: myPlanes[position].distance >=
+                                          color: myFlights[position].range >=
                                                   allFlights[widget.index].range
                                               ? Colors.black
                                               : Colors.red,
-                                          fontWeight: myPlanes[position]
-                                                      .distance >=
+                                          fontWeight: myFlights[position]
+                                                      .range >=
                                                   allFlights[widget.index].range
                                               ? FontWeight.normal
                                               : FontWeight.bold),
@@ -429,10 +482,10 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
                             Container(
                               child: FlatButton(
                                 child: Text(
-                                  widget.isClaimed ? 'VIEW MORE' : 'CLAIM',
+                                  'CLAIM',
                                   style: TextStyle(
                                       color: widget.isClaimed
-                                          ? Theme.of(context).accentColor
+                                          ? Colors.grey
                                           : myPlanes[position].distance >=
                                                       allFlights[widget.index]
                                                           .range ||
@@ -442,19 +495,55 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
                                               ? Theme.of(context).primaryColor
                                               : Colors.grey),
                                 ),
-                                onPressed: (myPlanes[position].distance >=
-                                            allFlights[widget.index].range ||
-                                        myPlanes[position].seats >=
-                                            allFlights[widget.index]
-                                                .minCapacity)
-                                    ? () {}
-                                    : null,
+                                onPressed: widget.isClaimed
+                                    ? null
+                                    : (myPlanes[position].distance >=
+                                                allFlights[widget.index]
+                                                    .range ||
+                                            myPlanes[position].seats >=
+                                                allFlights[widget.index]
+                                                    .minCapacity)
+                                        ? () {}
+                                        : null,
                               ),
                             ),
                           ],
                         ),
                       ],
                     ),
+                  ),
+                  Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(
+                          top: 30,
+                          right: 10,
+                          left: 10,
+                        ),
+                        child: LinearProgressIndicator(
+                          backgroundColor: Colors.transparent,
+                          value: progress,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.only(left: 10, top: 2),
+                            child: Text(myFlights[widget.index].departureId),
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(right: 10, top: 2),
+                            child: Text(myFlights[widget.index].arrivalId),
+                          ),
+                        ],
+                      ),
+                      if (progress == 1)
+                        Container(
+                          margin: EdgeInsets.only(top: 10),
+                          child: Text('Status: $status'),
+                        ),
+                    ],
                   ),
                 ],
               ),

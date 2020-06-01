@@ -119,13 +119,24 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
                 onAir: flights[item]['onAir'],
                 flightNumber: flights[item]['flightNo'],
                 flightTime: flights[item]['flightTime'],
+                arrivalTime: flights[item]['arrivalTime'],
               ),
             ];
+
             myActiveFlights.add(prepsFlights[0]);
+            if (DateTime.parse(myActiveFlights[0].arrivalTime)
+                .isAfter(DateTime.now())) {
+              print('future');
+              myActiveFlights[0].onAir = true;
+            } else {
+              myActiveFlights[0].onAir = false;
+              // myActiveFlights.removeAt(0);
+              print('done');
+            }
+
+            
           }
         }
-        // print(myFlights[countFlights].departureDes);
-        print(myActiveFlights.length);
 
         setState(() {
           isLoading = false;
@@ -144,6 +155,7 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
   @override
   void initState() {
     super.initState();
+    // dates();
     getFlights();
     getMyFlights();
   }

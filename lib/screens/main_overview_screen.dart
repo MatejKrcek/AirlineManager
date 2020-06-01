@@ -190,7 +190,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                       color: Colors.grey,
                     ),
                     SizedBox(
-                      height: 150,
+                      height: myFlights.length == 0 ? 100 : 150,
                       child: !isLoading
                           ? myFlights.length != 0
                               ? ListView.builder(

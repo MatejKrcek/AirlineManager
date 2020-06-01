@@ -71,6 +71,7 @@ class ChooseAirplaneState extends State<ChooseAirplane> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Choose Airplane'),
+        automaticallyImplyLeading: false,
       ),
       body: Container(
         child: Column(
