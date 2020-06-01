@@ -87,6 +87,7 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
         myPlanes.sort((a, b) => a.name.compareTo(b.name));
 
         var flights = map['flights'];
+        int i = 0;
         for (var item in flights.keys) {
           List<MyFlights> prepsFlights = [
             MyFlights(
@@ -107,16 +108,18 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
             ),
           ];
           myFlights.add(prepsFlights[0]);
-          if (DateTime.parse(myFlights[0].arrivalTime)
+
+          if (DateTime.parse(myFlights[i].arrivalTime)
               .isAfter(DateTime.now())) {
             print('future');
             myFlights[0].onAir = true;
-            myRunningFlights.add(myFlights[0]);
+            myRunningFlights.add(myFlights[i]);
           } else {
             myFlights[0].onAir = false;
             // myFlights.removeAt(0);
             print('done');
           }
+          i++;
         }
         setState(() {
           isLoading = false;

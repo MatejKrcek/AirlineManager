@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:intl/intl.dart';
 import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 
@@ -221,7 +222,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                           : '${myActiveFlights[index].departureDes} -> ${myActiveFlights[index].arrivalDes}',
                                       style: TextStyle(fontSize: 15),
                                     ),
-                                    subtitle: Text('Arive at: ${myActiveFlights[index].arrivalTime}'),
+                                    subtitle: Text('Arive at: ${DateFormat.MMMMd().add_Hm().format(DateTime.parse(myActiveFlights[index].arrivalTime))}'),
                                   ),
                                 )
                               : const Center(

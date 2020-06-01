@@ -109,6 +109,7 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
 
         if (map['flights'] != null) {
           var flights = map['flights'];
+          int i = 0;
           for (var item in flights.keys) {
             List<MyFlights> prepsFlights = [
               MyFlights(
@@ -126,17 +127,16 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
             ];
 
             myActiveFlights.add(prepsFlights[0]);
-            if (DateTime.parse(myActiveFlights[0].arrivalTime)
-                .isAfter(DateTime.now())) {
-              print('future');
 
+            if (DateTime.parse(myActiveFlights[i].arrivalTime)
+                .isAfter(DateTime.now())) {
               myActiveFlights[0].onAir = true;
-              myRunningFlights.add(myActiveFlights[0]);
+              myRunningFlights.add(myActiveFlights[i]);
             } else {
               myActiveFlights[0].onAir = false;
               //myActiveFlights.removeAt(0);
-              print('done');
             }
+            i++;
           }
         }
         print('LENGHT');
@@ -198,7 +198,10 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
       ),
       drawer: AppDrawer(),
       body: !isLoading || !isLoadingOther
-          ? Offers(myFlights, myActiveFlights, _showOnFlight, myRunningFlights)
+          ? RefreshIndicator(
+            onRefresh: () => getMyFlights(),
+              child: Offers(
+                  myFlights, myActiveFlights, _showOnFlight, myRunningFlights))
           : Center(
               child: CircularProgressIndicator(),
             ),
