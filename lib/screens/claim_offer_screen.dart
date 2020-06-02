@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'dart:async';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 
 import './select_plane_screen.dart';
 import '../models/user.dart';
@@ -36,6 +35,7 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
   bool isLoadingOther = false;
   bool claiming = false;
   int position;
+  bool kiwiLoader = false;
 
   double progToAd = 0;
   double progress = 0;
@@ -86,45 +86,50 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
         }
         myPlanes.sort((a, b) => a.name.compareTo(b.name));
 
-        var flights = map['flights'];
-        int i = 0;
-        for (var item in flights.keys) {
-          List<MyFlights> prepsFlights = [
-            MyFlights(
-              id: item,
-              arrivalDes: flights[item]['arrivalDes'],
-              departureDes: flights[item]['departureDes'],
-              aircraft: flights[item]['aircraft'],
-              departureTime: flights[item]['departureTime'],
-              reward: flights[item]['reward'],
-              onAir: flights[item]['onAir'],
-              flightNumber: flights[item]['flightNo'],
-              flightTime: flights[item]['flightTime'],
-              arrivalTime: flights[item]['arrivalTime'],
-              arrivalId: flights[item]['arrivalId'],
-              departureId: flights[item]['departureId'],
-              range: flights[item]['range'],
-              minCapacity: flights[item]['minCapacity'],
-            ),
-          ];
-          myFlights.add(prepsFlights[0]);
+        if (map['flights'] != null) {
+          var flights = map['flights'];
+          int i = 0;
+          for (var item in flights.keys) {
+            List<MyFlights> prepsFlights = [
+              MyFlights(
+                id: item,
+                arrivalDes: flights[item]['arrivalDes'],
+                departureDes: flights[item]['departureDes'],
+                aircraft: flights[item]['aircraft'],
+                departureTime: flights[item]['departureTime'],
+                reward: flights[item]['reward'],
+                onAir: flights[item]['onAir'],
+                flightNumber: flights[item]['flightNo'],
+                flightTime: flights[item]['flightTime'],
+                arrivalTime: flights[item]['arrivalTime'],
+                arrivalId: flights[item]['arrivalId'],
+                departureId: flights[item]['departureId'],
+                range: flights[item]['range'],
+                minCapacity: flights[item]['minCapacity'],
+              ),
+            ];
+            myFlights.add(prepsFlights[0]);
 
-          if (DateTime.parse(myFlights[i].arrivalTime)
-              .isAfter(DateTime.now())) {
-            print('future');
-            myFlights[0].onAir = true;
-            myRunningFlights.add(myFlights[i]);
-          } else {
-            myFlights[0].onAir = false;
-            // myFlights.removeAt(0);
-            print('done');
+            if (DateTime.parse(myFlights[i].arrivalTime)
+                .isAfter(DateTime.now())) {
+              print('future');
+              myFlights[0].onAir = true;
+              myRunningFlights.add(myFlights[i]);
+            } else {
+              myFlights[0].onAir = false;
+              // myFlights.removeAt(0);
+              print('done');
+            }
+            i++;
           }
-          i++;
         }
+
         setState(() {
           isLoading = false;
         });
-        print('LOADED');
+        if (widget.isClaimed) {
+          getKiwiData();
+        }
         setup();
       } else {
         print('error');
@@ -167,9 +172,10 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
               price: map[item]['reward'],
               created: map[item]['created'],
               minCapacity: map[item]['minCapacity'],
+              departureId: map[item]['departureId'],
+              arrivalId: map[item]['arrivalId'],
             ),
           ];
-          // print(flightList[0].departureDes);
           setState(() {
             allFlights.add(flightList[0]);
           });
@@ -177,8 +183,10 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
 
         setState(() {
           isLoadingOther = false;
-          // widget.isClaimed = true;
         });
+        if (!widget.isClaimed) {
+          getKiwiData();
+        }
       } else {
         print('error');
         setState(() {
@@ -318,6 +326,60 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
     getFlights();
     if (widget.isClaimed) {
       timer = Timer.periodic(Duration(seconds: 1), (Timer t) => update());
+    }
+  }
+
+  void openKiwi() async {
+    const url = 'https://kiwi.com';
+    if (await canLaunch(url)) {
+      await launch(url);
+      print('ano');
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  Future getKiwiData() async {
+    print('loading');
+    setState(() {
+      kiwiLoader = true;
+    });
+    String time = DateFormat.yMd().format(DateTime.now()).toString();
+    var arr = time.split('/');
+    var url;
+    if (widget.isClaimed) {
+      url =
+          'https://kiwicom-prod.apigee.net/v2/search?fly_from=${myRunningFlights[widget.index].departureId}&fly_to=${myRunningFlights[widget.index].arrivalId}&date_from=${arr[1]}%2F${arr[0]}%2F${arr[2]}&date_to=${arr[1]}%2F07%2F2020&return_from=02%2F06%2F2020&return_to=02%2F07%2F2020&nights_in_dst_from=1&nights_in_dst_to=14&max_fly_duration=20&flight_type=round&adults=1&selected_cabins=C&mix_with_cabins=M&partner_market=us&max_stopovers=2&vehicle_type=aircraft';
+    } else {
+      url =
+          'https://kiwicom-prod.apigee.net/v2/search?fly_from=${allFlights[widget.index].departureId}&fly_to=${allFlights[widget.index].arrivalId}&date_from=${arr[1]}%2F${arr[0]}%2F${arr[2]}&date_to=${arr[1]}%2F07%2F2020&return_from=02%2F06%2F2020&return_to=02%2F07%2F2020&nights_in_dst_from=1&nights_in_dst_to=14&max_fly_duration=20&flight_type=round&adults=1&selected_cabins=C&mix_with_cabins=M&partner_market=us&max_stopovers=2&vehicle_type=aircraft';
+    }
+
+    try {
+      Map<String, String> head = {'apikey': 'yd0zaA0gsNHmeHljmKGEikKQTwgS2S5d'};
+
+      var response = await http.get(url, headers: head);
+
+      if (response.statusCode == 200) {
+        print(response.body[0]);
+        Map<String, dynamic> map = convert.jsonDecode(response.body);
+        if (map == null) {
+          return;
+        }
+        print(map);
+
+        setState(() {
+          kiwiLoader = false;
+          // widget.isClaimed = true;
+        });
+      } else {
+        print('error');
+        setState(() {
+          kiwiLoader = false;
+        });
+      }
+    } catch (error) {
+      print(error);
     }
   }
 
@@ -677,37 +739,42 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
                       child: Card(
                         color: Color.fromRGBO(236, 248, 247, 1),
                         elevation: 5,
-                        child: Column(
-                          children: <Widget>[
-                            ListTile(
-                              title: Text(widget.isClaimed
-                                  ? 'Visit ${myRunningFlights[widget.index].arrivalDes} in real life.'
-                                  : 'Visit ${allFlights[widget.index].arrivalDes} in real life.'),
-                              trailing: Container(
-                                width: 80,
-                                child: Image.asset(
-                                  'assets/kiwi.png',
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                Container(
-                                  margin: EdgeInsets.only(left: 15, bottom: 10),
-                                  child: Text(
-                                    !widget.isClaimed
-                                        ? '${allFlights[widget.index].departureDes} -> ${allFlights[widget.index].arrivalDes} from '
-                                        : '${myRunningFlights[widget.index].departureDes} -> ${myRunningFlights[widget.index].arrivalDes} from',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                    ),
+                        child: GestureDetector(
+                          onTap: openKiwi,
+                          child: Column(
+                            children: <Widget>[
+                              ListTile(
+                                title: Text(widget.isClaimed
+                                    ? 'Visit ${myRunningFlights[widget.index].arrivalDes} in real life.'
+                                    : 'Visit ${allFlights[widget.index].arrivalDes} in real life.'),
+                                trailing: Container(
+                                  width: 80,
+                                  child: Image.asset(
+                                    'assets/kiwi.png',
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
+                                subtitle: Text('Click to view more.'),
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Container(
+                                    margin:
+                                        EdgeInsets.only(left: 15, bottom: 10),
+                                    child: Text(
+                                      !widget.isClaimed
+                                          ? '${allFlights[widget.index].departureDes} -> ${allFlights[widget.index].arrivalDes} from \$320 '
+                                          : '${myRunningFlights[widget.index].departureDes} -> ${myRunningFlights[widget.index].arrivalDes} from \$320',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

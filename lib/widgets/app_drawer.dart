@@ -59,7 +59,7 @@ class AppDrawer extends StatelessWidget {
                   left: 5,
                 ),
                 child: Text(
-                  '0.9.1 Beta',
+                  '0.9.2 Beta',
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: 10,

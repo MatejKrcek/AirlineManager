@@ -11,6 +11,8 @@ class Offer {
   int price;
   String departureTime;
   int time;
+  String departureId;
+  String arrivalId;
 
   Offer({
     @required this.id,
@@ -23,5 +25,7 @@ class Offer {
     @required this.range,
     @required this.minCapacity,
     @required this.expiration,
+    this.departureId,
+    this.arrivalId,
   });
 }

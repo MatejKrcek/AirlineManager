@@ -65,9 +65,6 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
       myActiveFlights = [];
     });
 
-    var url =
-        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=0d865038-de6d-4d50-9728-37a415ad8bdd';
-
     var url2 =
         'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=${User.uid}';
 
