@@ -29,11 +29,11 @@ Next steps
 ### Screenshots
 Check out a few screenshots from my app!
 
-![Screenshot](photos/ScreenMain.jpg) {width: 200px;}
-![Screenshot](photos/ScreenOfferDetail.jpg)
-![Screenshot](photos/ScreenInventory.jpg)
-![Screenshot](photos/ScreenPlaneDetail.jpg)
-![Screenshot](photos/ScreenOffers.jpg)
+![Screenshot](photos/ScreenMain.jpg) {width: 50px;}
+![Screenshot](photos/ScreenOfferDetail.jpg) {width: 50px;}
+![Screenshot](photos/ScreenInventory.jpg) {width: 50px;}
+![Screenshot](photos/ScreenPlaneDetail.jpg) {width: 50px;}
+![Screenshot](photos/ScreenOffers.jpg) {width: 50px;}
 
 
 ## Technical information
