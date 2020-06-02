@@ -27,7 +27,13 @@ Next steps
 * September - publish version 1.0 for iOS, divide flight offers into categories
 
 ### Screenshots
-![Screenshot](assets/kiwi.png)
+Check out a few screenshots from my app!
+
+![Screenshot](photos/ScreenMain.jpg)
+![Screenshot](photos/ScreenOfferDetail.jpg)
+![Screenshot](photos/ScreenInventory.jpg)
+![Screenshot](photos/ScreenPlaneDetail.jpg)
+![Screenshot](photos/ScreenOffers.jpg)
 
 
 ## Technical information
