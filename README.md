@@ -29,7 +29,7 @@ Next steps
 ### Screenshots
 Check out a few screenshots from my app!
 
-![Screenshot](photos/ScreenMain.jpg)
+![Screenshot](photos/ScreenMain.jpg =250px)
 ![Screenshot](photos/ScreenOfferDetail.jpg)
 ![Screenshot](photos/ScreenInventory.jpg)
 ![Screenshot](photos/ScreenPlaneDetail.jpg)
