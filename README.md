@@ -29,6 +29,8 @@ Next steps
 ### Screenshots
 Check out a few screenshots from my app!
 
+<img src="photos/ScreenMain.jpg" width="200">
+
 ![Screenshot](photos/ScreenMain.jpg) {width: 50px;}
 ![Screenshot](photos/ScreenOfferDetail.jpg) {width: 50px;}
 ![Screenshot](photos/ScreenInventory.jpg) {width: 50px;}
