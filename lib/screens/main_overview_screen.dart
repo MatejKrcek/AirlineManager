@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/app_drawer.dart';
 import '../models/user.dart';
 import '../models/myAirplanes.dart';
 import '../models/myFlights.dart';
 import '../models/offer.dart';
+import '../screens/auth_screen.dart';
 
 class MainOverviewScreen extends StatefulWidget {
   @override
@@ -29,6 +31,31 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
 
   Future getData() async {
     print(User.uid);
+
+    if (User.uid == null) {
+      final prefs = await SharedPreferences.getInstance();
+      final extractedUserData =
+          convert.jsonDecode(prefs.getString('data')) as Map<String, Object>;
+      final id = extractedUserData['id'];
+      print(id);
+
+      if (!prefs.containsKey('data') ||
+          extractedUserData == null ||
+          id == null) {
+        print('oops');
+        setState(() {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AuthScreen()),
+          );
+        });
+      } else {
+        setState(() {
+          User.uid = id;
+        });
+      }
+    }
+
     setState(() {
       isLoading = true;
       countPlanes = 0;
@@ -95,7 +122,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
               ),
             ];
             myFlights.add(prepsFlights[0]);
-            
+
             if (DateTime.parse(myFlights[i].arrivalTime)
                 .isAfter(DateTime.now())) {
               print('future');
@@ -222,7 +249,8 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                           : '${myActiveFlights[index].departureDes} -> ${myActiveFlights[index].arrivalDes}',
                                       style: TextStyle(fontSize: 15),
                                     ),
-                                    subtitle: Text('Arive at: ${DateFormat.MMMMd().add_Hm().format(DateTime.parse(myActiveFlights[index].arrivalTime))}'),
+                                    subtitle: Text(
+                                        'Arive at: ${DateFormat.MMMMd().add_Hm().format(DateTime.parse(myActiveFlights[index].arrivalTime))}'),
                                   ),
                                 )
                               : const Center(

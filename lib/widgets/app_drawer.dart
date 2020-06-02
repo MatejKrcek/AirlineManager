@@ -51,12 +51,23 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           Divider(),
-          ListTile(
-            leading: Icon(Icons.exit_to_app),
-            title: Text('Logout'),
-            onTap: () {
-              FirebaseAuth.instance.signOut();
-            },
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(
+                  left: 5,
+                ),
+                child: Text(
+                  '0.9.1 Beta',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 10,
+                  ),
+                  textAlign: TextAlign.left,
+                ),
+              ),
+            ],
           ),
         ],
       ),

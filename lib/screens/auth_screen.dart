@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'dart:io';
 import 'dart:math';
+import 'dart:convert' as convert;
 
 import '../widgets/auth_form.dart';
 import '../models/user.dart';
+import './main_overview_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -17,51 +16,59 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final _auth = FirebaseAuth.instance;
-  final _googleSignIn = GoogleSignIn();
   var _isLoading = false;
 
   Future<void> _submitAuthForm(
-    String email,
-    String password,
     String username,
-    bool isLogin,
+    String airlineName,
     BuildContext ctx,
   ) async {
-    
-    print('start');
-    AuthResult authResult;
+    // print(username);
+    // print(airlineName);
+
+    // if (!prefs.containsKey('data')) {
+    //   print('oops');
+    //   return false;
+    // }
+
+    // final extractedUserData =
+    //     convert.jsonDecode(prefs.getString('data')) as Map<String, Object>;
+    // final id = extractedUserData['id'];
 
     try {
       setState(() {
         _isLoading = true;
       });
-      if (isLogin) {
-        authResult = await _auth.signInWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-        String myId = authResult.user.uid;
-        User.uid = myId;
-        print(User.uid);
+      var url =
+          'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/personCreate?personName=$username';
 
-      } else {
-        authResult = await _auth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+      var response = await http.get(url);
+      if (response.statusCode == 200) {
+        var jsonResponse = convert.jsonDecode(response.body);
 
-        var url =
-            'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/personCreate?personId=${authResult.user.uid}&personName=$username';
+        String id = jsonResponse['personId'];
+        print(id);
 
-        await http.get(url);
+        setState(() {
+          User.uid = id;
+        });
 
-        String myId = authResult.user.uid;
-        User.uid = myId;
-        print(User.uid);
-
-        print('done');
+        final prefs = await SharedPreferences.getInstance();
+        final key = 'data';
+        final userData = convert.jsonEncode({
+          'username': username,
+          'airlineName': airlineName,
+          'id': id,
+        });
+        prefs.setString(key, userData);
+        print('saved $userData');
       }
+
+      print('done');
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MainOverviewScreen()),
+      );
     } on PlatformException catch (err) {
       var message = 'An error occurred, pelase check your credentials!';
 
@@ -85,35 +92,6 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  Future<String> signInWithGoogle() async {
-    final GoogleSignInAccount googleSignInAccount =
-        await _googleSignIn.signIn();
-    final GoogleSignInAuthentication googleSignInAuthentication =
-        await googleSignInAccount.authentication;
-
-    final AuthCredential credential = GoogleAuthProvider.getCredential(
-      accessToken: googleSignInAuthentication.accessToken,
-      idToken: googleSignInAuthentication.idToken,
-    );
-
-    final AuthResult authResult = await _auth.signInWithCredential(credential);
-    final FirebaseUser _user = authResult.user;
-
-    assert(!_user.isAnonymous);
-    assert(await _user.getIdToken() != null);
-
-    final FirebaseUser currentUser = await _auth.currentUser();
-    assert(_user.uid == currentUser.uid);
-
-    return 'signInWithGoogle succeeded: $_user';
-  }
-
-  void signOutGoogle() async {
-    await _googleSignIn.signOut();
-
-    print("User Sign Out");
-  }
-
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
@@ -127,21 +105,6 @@ class _AuthScreenState extends State<AuthScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              // RaisedButton(
-              //   child: Text('Sign with Google'),
-              //   onPressed: () {
-              //     signInWithGoogle().whenComplete(() => print('done'));
-              //   },
-              // ),
-              // RaisedButton(
-              //   child: Text('Sign out'),
-              //   onPressed: () {
-              //     signOutGoogle();
-              //   },
-              // ),
-              // SizedBox(
-              //   height: 30,
-              // ),
               Flexible(
                 child: Container(
                   margin: EdgeInsets.only(bottom: 20.0),
@@ -170,7 +133,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 ),
               ),
-              AuthForm(_submitAuthForm, _isLoading, signInWithGoogle),
+              AuthForm(_submitAuthForm, _isLoading),
             ],
           ),
         ),
