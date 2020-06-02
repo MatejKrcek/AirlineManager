@@ -4,6 +4,7 @@ The most realistic Airline Manager mobile game. The game is running on Android &
 
 A project for Kiwi.com Mobile Challenge.
 
+Application is in alfa version. Beta version is coming soon.
 ## General information
 
 The Airline Manager is a singleplayer mobile game. You can manage your airline in real-time. My vision is to create a version, where players can compete and play together. You will be able to buy a slot at your favorite airport, manage board services and areas (economy, business, first-class).     
@@ -30,13 +31,10 @@ Next steps
 Check out a few screenshots from my app!
 
 <img src="photos/ScreenMain.jpg" width="200">
-
-![Screenshot](photos/ScreenMain.jpg) {width: 50px;}
-![Screenshot](photos/ScreenOfferDetail.jpg) {width: 50px;}
-![Screenshot](photos/ScreenInventory.jpg) {width: 50px;}
-![Screenshot](photos/ScreenPlaneDetail.jpg) {width: 50px;}
-![Screenshot](photos/ScreenOffers.jpg) {width: 50px;}
-
+<img src="photos/ScreenOfferDetail.jpg" width="200">
+<img src="photos/ScreenInventory.jpg" width="200">
+<img src="photos/ScreenPlaneDetail.jpg" width="200">
+<img src="photos/ScreenOffers.jpg" width="200">
 
 ## Technical information
 
