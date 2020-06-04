@@ -62,6 +62,7 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
               totalFlightTime: airplanes[item]['totalFlightTime'],
               totalFlights: airplanes[item]['totalFlights'],
               aircraftIdentity: airplanes[item]['aircraftIdentity'],
+              arrivalTime: airplanes[item]['arrivalTime'],
             ),
           ];
           myPlanes.add(preps[0]);
@@ -191,9 +192,48 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
-            isLoading ? 'Detail' : 'Detail - ${myPlanes[widget.index].name}'),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0,
+        title: isLoading
+            ? RichText(
+                text: TextSpan(
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline6
+                      .copyWith(fontWeight: FontWeight.bold),
+                  children: [
+                    TextSpan(
+                      text: "Detail ",
+                      style: TextStyle(color: Theme.of(context).primaryColor),
+                    ),
+                    TextSpan(
+                      text: "",
+                      style: TextStyle(color: Theme.of(context).accentColor),
+                    ),
+                  ],
+                ),
+              )
+            : RichText(
+                text: TextSpan(
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline6
+                      .copyWith(fontWeight: FontWeight.bold),
+                  children: [
+                    TextSpan(
+                      text: "Detail ",
+                      style: TextStyle(color: Theme.of(context).primaryColor),
+                    ),
+                    TextSpan(
+                      text: "- ${myPlanes[widget.index].name}",
+                      style: TextStyle(color: Theme.of(context).accentColor),
+                    ),
+                  ],
+                ),
+              ),
       ),
       body: isLoading
           ? const Center(
@@ -207,11 +247,11 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
                 children: <Widget>[
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(15),
                       color: Colors.grey,
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(15),
                       child: Image.network(
                         myPlanes[widget.index].imageUrl,
                         fit: BoxFit.cover,
@@ -222,11 +262,19 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
                     height: 20,
                   ),
                   Card(
-                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
                     child: Column(
                       children: <Widget>[
                         ListTile(
-                          title: Text('Name: ${myPlanes[widget.index].name}'),
+                          title: Text(
+                            '${myPlanes[widget.index].name}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).accentColor,
+                            ),
+                          ),
                         ),
                         Row(
                           children: <Widget>[
@@ -262,25 +310,27 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
                             ),
                           ],
                         ),
-                        // Row(
-                        //   children: <Widget>[
-                        //     Container(
-                        //       margin: EdgeInsets.only(
-                        //         left: 15,
-                        //         bottom: 5,
-                        //       ),
-                        //       child: Text(
-                        //         myAirplanes[widget.index].onFlight
-                        //             ? 'Status: On Flight'
-                        //             : 'Status: In Hangar',
-                        //         textAlign: TextAlign.left,
-                        //         style: TextStyle(
-                        //           fontSize: 15,
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
+                        Row(
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(
+                                left: 15,
+                                bottom: 5,
+                              ),
+                              child: Text(
+                                DateTime.parse(
+                                            myPlanes[widget.index].arrivalTime)
+                                        .isAfter(DateTime.now())
+                                    ? 'Status: On Flight'
+                                    : 'Status: Available',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                         Row(
                           children: <Widget>[
                             Container(
@@ -309,7 +359,9 @@ class _AirplaneDetailScreenState extends State<AirplaneDetailScreen> {
                                 child: Text(
                                   'SELL NOW',
                                   style: TextStyle(
-                                      color: Theme.of(context).primaryColor),
+                                    color: Theme.of(context).primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 onPressed: () {
                                   _showDialog(widget.index);

@@ -1,15 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../widgets/app_drawer.dart';
 
 class StatsScreen extends StatelessWidget {
   static const routeName = '/stats-screen';
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Statistics'),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0,
+        leading: IconButton(
+            icon: SvgPicture.asset(
+              "assets/svg/menu.svg",
+              color: Theme.of(context).accentColor,
+            ),
+            onPressed: () {
+              _scaffoldKey.currentState.openDrawer();
+            }),
+        title: RichText(
+          text: TextSpan(
+            style: Theme.of(context)
+                .textTheme
+                .headline6
+                .copyWith(fontWeight: FontWeight.bold),
+            children: [
+              TextSpan(
+                text: "Statistics",
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              TextSpan(
+                text: " and Scoreboard",
+                style: TextStyle(color: Theme.of(context).accentColor),
+              ),
+            ],
+          ),
+        ),
       ),
       drawer: AppDrawer(),
       body: Container(
@@ -22,7 +54,9 @@ class StatsScreen extends StatelessWidget {
                 DataColumn(
                   label: Text(
                     'Username',
-                    style: TextStyle(fontStyle: FontStyle.italic),
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
                 ),
                 DataColumn(

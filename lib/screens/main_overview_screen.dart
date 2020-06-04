@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../widgets/app_drawer.dart';
 import '../models/user.dart';
@@ -19,6 +20,7 @@ class MainOverviewScreen extends StatefulWidget {
 
 class _MainOverviewScreenState extends State<MainOverviewScreen> {
   bool isLoading = false;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<User> user = [];
   List<MyFlights> myFlights = [];
@@ -94,6 +96,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
               totalFlightTime: airplanes[item]['totalFlightTime'],
               totalFlights: airplanes[item]['totalFlights'],
               aircraftIdentity: airplanes[item]['aircraftIdentity'],
+              arrivalTime: airplanes[item]['arrivalTime'],
             ),
           ];
           myPlanes.add(preps[0]);
@@ -180,10 +183,40 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Airline Overview'),
-      ),
       drawer: AppDrawer(),
+      backgroundColor: Colors.white,
+      key: _scaffoldKey,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0,
+        leading: IconButton(
+            icon: SvgPicture.asset(
+              "assets/svg/menu.svg",
+              color: Theme.of(context).accentColor,
+            ),
+            onPressed: () {
+              _scaffoldKey.currentState.openDrawer();
+            }),
+        title: RichText(
+          text: TextSpan(
+            style: Theme.of(context)
+                .textTheme
+                .headline6
+                .copyWith(fontWeight: FontWeight.bold),
+            children: [
+              TextSpan(
+                text: "Airline ",
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              TextSpan(
+                text: "Manager",
+                style: TextStyle(color: Theme.of(context).accentColor),
+              ),
+            ],
+          ),
+        ),
+      ),
       body: RefreshIndicator(
         onRefresh: () => getData(),
         child: SingleChildScrollView(
@@ -191,67 +224,174 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
           child: Column(
             children: <Widget>[
               Card(
-                elevation: 5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
                 margin: const EdgeInsets.all(10),
                 child: Column(
                   children: <Widget>[
                     ListTile(
                       title: Text(isLoading
                           ? 'Loading...'
-                          : 'User: ${user[0].username}'),
-                      trailing: Text(isLoading
-                          ? 'Loading...'
-                          : 'Coins: ${user[0].coins.toString()}'),
+                          : '${user[0].username}, CEO, Kiwi Airlines'),
+                      trailing: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        child: GestureDetector(
+                          onTap: () {},
+                          child: CircleAvatar(
+                            backgroundColor: Theme.of(context).primaryColor,
+                            child: Icon(Icons.person),
+                          ),
+                        ),
+                      ),
                     ),
                     ListTile(
                       title: Text(isLoading
                           ? 'Loading...'
-                          : 'Airline: ${user[0].airlineName}'),
+                          : 'Coins: ${user[0].coins.toString()}'),
                     ),
                   ],
                 ),
               ),
-              Card(
-                elevation: 5,
-                margin: const EdgeInsets.all(10),
+              SizedBox(
+                height: 15,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Column(
                   children: <Widget>[
-                    ListTile(
-                      title: Text('Active flights'),
-                      trailing: FlatButton(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pushReplacementNamed('/offers-screen');
-                        },
-                        child: Text(
-                          'View All',
-                          style:
-                              TextStyle(color: Theme.of(context).primaryColor),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4),
+                          child: RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "Active ",
+                                  style: TextStyle(
+                                    color: Theme.of(context).primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: "Flight Offers",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).accentColor,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
+                      ],
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 15,
+                        horizontal: 0,
                       ),
-                    ),
-                    Divider(
-                      color: Colors.grey,
-                    ),
-                    SizedBox(
-                      height: myActiveFlights.length == 0 ? 100 : 150,
+                      width: double.infinity,
+                      height: myActiveFlights.length == 0 ? 80 : 200,
                       child: !isLoading
                           ? myActiveFlights.length != 0
                               ? ListView.builder(
+                                  scrollDirection: Axis.horizontal,
                                   itemCount: myActiveFlights.length,
-                                  itemBuilder: (context, index) => ListTile(
-                                    title: Text(
-                                      isLoading
-                                          ? 'Loading...'
-                                          : '${myActiveFlights[index].departureDes} -> ${myActiveFlights[index].arrivalDes}',
-                                      style: TextStyle(fontSize: 15),
+                                  itemBuilder: (context, index) => Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
                                     ),
-                                    subtitle: Text(
-                                        'Arive at: ${DateFormat.MMMMd().add_Hm().format(DateTime.parse(myActiveFlights[index].arrivalTime))}'),
+                                    child: Card(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: Column(
+                                        children: <Widget>[
+                                          Container(
+                                            width: 170,
+                                            height: 100,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              child: Image.network(
+                                                '',
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 15,
+                                          ),
+                                          Text(
+                                            isLoading
+                                                ? 'Loading...'
+                                                : '${myActiveFlights[index].departureDes} -> ${myActiveFlights[index].arrivalDes}',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color:
+                                                  Theme.of(context).accentColor,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          SizedBox(
+                                            height: 15,
+                                          ),
+                                          Text(
+                                            isLoading
+                                                ? 'Loading...'
+                                                : 'Arrive at: ${DateFormat.MMMMd().add_Hm().format(DateTime.parse(myActiveFlights[index].arrivalTime).add(Duration(hours: 2)))}',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyText1
+                                                    .color
+                                                    .withOpacity(0.7)),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 )
-                              : const Center(
-                                  child: const Text('Hey! Claim a offer!'),
+                              : Center(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text('Hey! You have no active offer!'),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      RaisedButton(
+                                        child: Text('Claim Offer'),
+                                        onPressed: () {
+                                          Navigator.of(context)
+                                              .pushReplacementNamed(
+                                                  '/offers-screen');
+                                        },
+                                        color: Theme.of(context).primaryColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 )
                           : const Center(
                               child: CircularProgressIndicator(),
@@ -260,54 +400,79 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                   ],
                 ),
               ),
-              Card(
-                elevation: 5,
-                margin: const EdgeInsets.all(10),
+              SizedBox(
+                height: 15,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Column(
                   children: <Widget>[
-                    ListTile(
-                      title: Text(
-                        'My Aircrafts',
-                      ),
-                      trailing: FlatButton(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pushReplacementNamed('/inventory-screen');
-                        },
-                        child: Text(
-                          'View All',
-                          style:
-                              TextStyle(color: Theme.of(context).primaryColor),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4),
+                          child: RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "My ",
+                                  style: TextStyle(
+                                    color: Theme.of(context).primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: "Airplanes",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).accentColor,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                    SizedBox(
-                      height: myPlanes.length == 0 ? 100 : 235,
-                      child: Container(
-                        height: 230,
-                        child: myPlanes.length == 0
-                            ? Center(
-                                child: Text(
-                                    'Hey! You have no airplane! Visit shop!'))
-                            : ListView.builder(
-                                itemCount: countPlanes + 1,
-                                scrollDirection: Axis.horizontal,
-                                itemBuilder: (context, index) => Container(
-                                  margin: EdgeInsets.only(right: 10),
-                                  width: 160,
+                    Container(
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 15,
+                        horizontal: 0,
+                      ),
+                      width: double.infinity,
+                      height: myPlanes.length == 0 ? 50 : 230,
+                      child: myPlanes.length == 0
+                          ? Center(
+                              child: Text(
+                                  'Hey! You have no airplane! Visit shop!'),
+                            )
+                          : ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: countPlanes + 1,
+                              itemBuilder: (context, index) => Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
                                   child: Column(
                                     children: <Widget>[
                                       Container(
-                                        width: 160,
+                                        width: 170,
                                         height: 100,
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(10),
+                                              BorderRadius.circular(15),
                                           color: Colors.grey,
                                         ),
                                         child: ClipRRect(
                                           borderRadius:
-                                              BorderRadius.circular(10),
+                                              BorderRadius.circular(15),
                                           child: Image.network(
                                             myPlanes[index].imageUrl,
                                             fit: BoxFit.cover,
@@ -315,27 +480,31 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                         ),
                                       ),
                                       SizedBox(
-                                        height: 10,
+                                        height: 15,
                                       ),
                                       Text(
                                         isLoading
                                             ? 'Loading...'
                                             : myPlanes[index].name,
                                         style: TextStyle(
-                                            fontWeight: FontWeight.bold),
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).accentColor,
+                                        ),
+                                        textAlign: TextAlign.center,
                                       ),
                                       SizedBox(
                                         height: 10,
                                       ),
                                       Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         children: <Widget>[
                                           Container(
-                                            margin: EdgeInsets.only(left: 10),
                                             child: Text(
                                               isLoading
                                                   ? 'Loading...'
                                                   : 'Range: ${myPlanes[index].distance.toString()} km',
-                                              textAlign: TextAlign.left,
+                                              textAlign: TextAlign.center,
                                             ),
                                           ),
                                         ],
@@ -343,12 +512,11 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                       Row(
                                         children: <Widget>[
                                           Container(
-                                            margin: EdgeInsets.only(left: 10),
                                             child: Text(
                                               isLoading
                                                   ? 'Loading...'
                                                   : 'Seats: ${myPlanes[index].seats.toString()}',
-                                              textAlign: TextAlign.left,
+                                              textAlign: TextAlign.center,
                                             ),
                                           ),
                                         ],
@@ -356,21 +524,37 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
                                       SizedBox(
                                         height: 10,
                                       ),
-                                      // Text(
-                                      //   myPlanes[index].onFlight == ""
-                                      //       ? 'Available'
-                                      //       : 'On Flight',
-                                      //   style: TextStyle(
-                                      //     color: myPlanes[index].onFlight == ""
-                                      //         ? Colors.green
-                                      //         : Colors.red,
-                                      //   ),
-                                      // ),
+                                      Row(
+                                        children: <Widget>[
+                                          Container(
+                                            child: Text(
+                                              isLoading
+                                                  ? 'Loading...'
+                                                  : DateTime.parse(
+                                                              myPlanes[index]
+                                                                  .arrivalTime)
+                                                          .isAfter(
+                                                              DateTime.now())
+                                                      ? 'On Flight'
+                                                      : 'Available',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                color: DateTime.parse(
+                                                            myPlanes[index]
+                                                                .arrivalTime)
+                                                        .isAfter(DateTime.now())
+                                                    ? Colors.red
+                                                    : Colors.green,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ],
                                   ),
                                 ),
                               ),
-                      ),
+                            ),
                     ),
                   ],
                 ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
@@ -34,6 +34,7 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
   bool isLoadingOther = false;
   List<MyFlights> myRunningFlights = [];
   var _showOnFlight = false;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future getFlights() async {
     setState(() {
@@ -166,8 +167,38 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+      key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Flight Offers'),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+            icon: SvgPicture.asset(
+              "assets/svg/menu.svg",
+              color: Theme.of(context).accentColor,
+            ),
+            onPressed: () {
+              _scaffoldKey.currentState.openDrawer();
+            }),
+        title: RichText(
+          text: TextSpan(
+            style: Theme.of(context)
+                .textTheme
+                .headline6
+                .copyWith(fontWeight: FontWeight.bold),
+            children: [
+              TextSpan(
+                text: "Flight ",
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              TextSpan(
+                text: "Offers",
+                style: TextStyle(color: Theme.of(context).accentColor),
+              ),
+            ],
+          ),
+        ),
         actions: <Widget>[
           PopupMenuButton(
             tooltip: 'Show Filters',
@@ -199,7 +230,7 @@ class _OffersOverviewScreenState extends State<OffersOverviewScreen> {
       drawer: AppDrawer(),
       body: !isLoading || !isLoadingOther
           ? RefreshIndicator(
-            onRefresh: () => getMyFlights(),
+              onRefresh: () => getMyFlights(),
               child: Offers(
                   myFlights, myActiveFlights, _showOnFlight, myRunningFlights))
           : Center(

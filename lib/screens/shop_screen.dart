@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
@@ -15,7 +15,7 @@ class ShopScreen extends StatefulWidget {
 }
 
 class _ShopScreenState extends State<ShopScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool isLoading = false;
   bool isLoadingOther = false;
 
@@ -242,13 +242,19 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text("Close"),
+              child: Text(
+                "Close",
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             FlatButton(
-              child: Text("Buy now"),
+              child: Text(
+                "Buy now",
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
               onPressed: () {
                 _buy(index);
                 Navigator.of(context).pop();
@@ -264,8 +270,37 @@ class _ShopScreenState extends State<ShopScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Shop'),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0,
+        leading: IconButton(
+            icon: SvgPicture.asset(
+              "assets/svg/menu.svg",
+              color: Theme.of(context).accentColor,
+            ),
+            onPressed: () {
+              _scaffoldKey.currentState.openDrawer();
+            }),
+        title: RichText(
+          text: TextSpan(
+            style: Theme.of(context)
+                .textTheme
+                .headline6
+                .copyWith(fontWeight: FontWeight.bold),
+            children: [
+              TextSpan(
+                text: "Airplane ",
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              TextSpan(
+                text: "Shop",
+                style: TextStyle(color: Theme.of(context).accentColor),
+              ),
+            ],
+          ),
+        ),
       ),
       drawer: AppDrawer(),
       body: !isLoading && !isLoadingOther
@@ -275,111 +310,159 @@ class _ShopScreenState extends State<ShopScreen> {
                 child: Column(
                   children: <Widget>[
                     Card(
-                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      margin: const EdgeInsets.all(10),
                       child: ListTile(
                         title: Text(isLoading
                             ? 'Loading...'
                             : 'Coins: ${user[0].coins.toString()}'),
                       ),
                     ),
-                    Card(
-                      elevation: 5,
-                      margin: const EdgeInsets.all(10),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Column(
                         children: <Widget>[
-                          ListTile(
-                            title: Text(
-                              'Airplanes',
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: "Airplanes ",
+                                        style: TextStyle(
+                                          color: Theme.of(context).accentColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 17,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(
+                          Container(
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 15,
+                              horizontal: 0,
+                            ),
+                            width: double.infinity,
                             height: 280,
-                            child: Container(
-                              child: isLoading
-                                  ? Center(
-                                      child: CircularProgressIndicator(),
-                                    )
-                                  : ListView.builder(
-                                      itemCount: listOfAirplanes.length,
-                                      scrollDirection: Axis.horizontal,
-                                      itemBuilder: (context, index) =>
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: listOfAirplanes.length,
+                              itemBuilder: (context, index) => Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Column(
+                                    children: <Widget>[
+                                      Container(
+                                        width: 170,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          color: Colors.grey,
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          child: Image.network(
+                                            listOfAirplanes[index].imageUrl,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 15,
+                                      ),
+                                      Text(
+                                        isLoading
+                                            ? 'Loading...'
+                                            : listOfAirplanes[index].name,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).accentColor,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: <Widget>[
                                           Container(
-                                        margin: EdgeInsets.only(right: 10),
-                                        width: 160,
-                                        child: Column(
-                                          children: <Widget>[
-                                            Container(
-                                              width: 160,
-                                              height: 100,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                color: Colors.grey,
-                                              ),
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                child: Image.network(
-                                                  listOfAirplanes[index]
-                                                      .imageUrl,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
+                                            child: Text(
+                                              isLoading
+                                                  ? 'Loading...'
+                                                  : 'Range: ${listOfAirplanes[index].distance.toString()} km',
+                                              textAlign: TextAlign.center,
                                             ),
-                                            SizedBox(
-                                              height: 10,
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Container(
+                                            child: Text(
+                                              isLoading
+                                                  ? 'Loading...'
+                                                  : 'Seats: ${listOfAirplanes[index].seats.toString()}',
                                             ),
-                                            Text(
-                                              listOfAirplanes[index].name,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Container(
+                                            child: Text(
+                                              isLoading
+                                                  ? 'Loading...'
+                                                  : 'Speed: ${listOfAirplanes[index].speed.toString()}',
+                                              textAlign: TextAlign.center,
                                             ),
-                                            SizedBox(
-                                              height: 10,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                              left: 15,
+                                              bottom: 5,
                                             ),
-                                            Row(
-                                              children: <Widget>[
-                                                Container(
-                                                  margin:
-                                                      EdgeInsets.only(left: 10),
-                                                  child: Text(
-                                                    'Range: ${listOfAirplanes[index].distance.toString()} km',
-                                                    textAlign: TextAlign.left,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            Row(
-                                              children: <Widget>[
-                                                Container(
-                                                  margin:
-                                                      EdgeInsets.only(left: 10),
-                                                  child: Text(
-                                                    'Seats: ${listOfAirplanes[index].seats.toString()}',
-                                                    textAlign: TextAlign.left,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            Row(
-                                              children: <Widget>[
-                                                Container(
-                                                  margin:
-                                                      EdgeInsets.only(left: 10),
-                                                  child: Text(
-                                                    'Speed: ${listOfAirplanes[index].speed.toString()}',
-                                                    textAlign: TextAlign.left,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            Text(
+                                            child: Text(
                                               '${listOfAirplanes[index].price.toString()} coins',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                              ),
                                             ),
-                                            FlatButton(
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Container(
+                                            child: FlatButton(
                                               onPressed: user[0].coins <
                                                       listOfAirplanes[index]
                                                           .price
@@ -388,7 +471,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                                       _showDialog(index);
                                                     },
                                               child: Text(
-                                                'Buy now',
+                                                'BUY NOW',
                                                 style: TextStyle(
                                                   color: user[0].coins <
                                                           listOfAirplanes[index]
@@ -398,11 +481,14 @@ class _ShopScreenState extends State<ShopScreen> {
                                                           .primaryColor,
                                                 ),
                                               ),
-                                            )
-                                          ],
-                                        ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ],

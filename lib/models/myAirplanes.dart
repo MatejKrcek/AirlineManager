@@ -13,6 +13,7 @@ class MyAirplane {
   int totalFlights;
   String aircraftIdentity;
   String onFlight; //POZOR BOOL
+  String arrivalTime;
 
   MyAirplane({
     @required this.id,
@@ -27,5 +28,6 @@ class MyAirplane {
     @required this.totalFlights,
     @required this.aircraftIdentity,
     @required this.onFlight,
+    this.arrivalTime,
   });
 }

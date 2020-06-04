@@ -54,13 +54,19 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Airline Manager',
       theme: ThemeData(
-        primarySwatch: Colors.green,
-        accentColor: Colors.orange,
+        primaryColor: Color(0xFFFFC61F),
+        accentColor: Color.fromRGBO(40, 51, 74, 1),
+        textTheme: TextTheme(
+          bodyText1: TextStyle(
+            color: Color.fromRGBO(40, 51, 74, 0.9)
+          ),
+          bodyText2: TextStyle(
+            color: Color.fromRGBO(40, 51, 74, 0.9)
+          ),
+        ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: createAcc
-          ? AuthScreen()
-          : MainOverviewScreen(),
+      home: createAcc ? AuthScreen() : MainOverviewScreen(),
       routes: {
         OffersOverviewScreen.routeName: (ctx) => OffersOverviewScreen(),
         InventoryScreen.routeName: (ctx) => InventoryScreen(),

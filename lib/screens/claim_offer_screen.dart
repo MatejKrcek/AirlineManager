@@ -36,7 +36,6 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
   bool claiming = false;
   int position;
   bool kiwiLoader = false;
-
   double progToAd = 0;
   double progress = 0;
   String status = 'Departuring';
@@ -386,14 +385,49 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(widget.isClaimed ? 'View Offer' : 'Claim Offer'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        title: widget.isClaimed ? RichText(
+          text: TextSpan(
+            style: Theme.of(context)
+                .textTheme
+                .headline6
+                .copyWith(fontWeight: FontWeight.bold),
+            children: [
+              TextSpan(
+                text: "View ",
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              TextSpan(
+                text: "Flight",
+                style: TextStyle(color: Theme.of(context).accentColor),
+              ),
+            ],
+          ),
+        ) : RichText(
+          text: TextSpan(
+            style: Theme.of(context)
+                .textTheme
+                .headline6
+                .copyWith(fontWeight: FontWeight.bold),
+            children: [
+              TextSpan(
+                text: "Claim ",
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              TextSpan(
+                text: "Flight",
+                style: TextStyle(color: Theme.of(context).accentColor),
+              ),
+            ],
+          ),
+        ),
         leading: IconButton(
           icon: Icon(Icons.keyboard_backspace),
           onPressed: () {
-            // timer.cancel();
-            // countdown.cancel();
             Navigator.pop(context);
           },
         ),
