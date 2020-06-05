@@ -32,11 +32,11 @@ Next steps
 ### Screenshots
 Check out a few screenshots from my app!
 
-<img src="photos/ScreenMain.jpg" width="200">
-<img src="photos/ScreenOfferDetail.jpg" width="200">
-<img src="photos/ScreenInventory.jpg" width="200">
-<img src="photos/ScreenPlaneDetail.jpg" width="200">
+<img src="photos/ScreenOverview.jpg" width="200">
 <img src="photos/ScreenOffers.jpg" width="200">
+<img src="photos/ScreenOfferDetail.jpg" width="200">
+<img src="photos/ScreenDetail.jpg" width="200">
+<img src="photos/ScreenShop.jpg" width="200">
 
 ## Technical information
 

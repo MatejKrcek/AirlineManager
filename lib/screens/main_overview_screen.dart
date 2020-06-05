@@ -102,6 +102,7 @@ class _MainOverviewScreenState extends State<MainOverviewScreen> {
           myPlanes.add(preps[0]);
         }
         countPlanes = myPlanes.length - 1;
+        myPlanes.sort((a, b) => a.name.compareTo(b.name));
 
         if (map['flights'] != null) {
           var flights = map['flights'];
