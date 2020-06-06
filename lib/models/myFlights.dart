@@ -5,7 +5,7 @@ class MyFlights {
   String departureDes;
   String arrivalDes;
   String aircraft;
-  String departureTime; //POZOR
+  String departureTime;
   bool onAir;
   String flightNumber;
   int reward;
@@ -15,21 +15,29 @@ class MyFlights {
   String departureId;
   int range;
   int minCapacity;
+  String category;
+  int expiration;
+  String note;
+  String imageUrl;
 
   MyFlights({
-    @required this.id,
-    @required this.departureDes,
-    @required this.arrivalDes,
-    @required this.aircraft,
-    @required this.flightNumber,
-    @required this.onAir,
-    @required this.departureTime,
-    @required this.reward,
-    @required this.flightTime,
+    this.id,
+    this.departureDes,
+    this.arrivalDes,
+    this.aircraft,
+    this.flightNumber,
+    this.onAir,
+    this.departureTime,
+    this.reward,
+    this.flightTime,
     this.arrivalTime,
     this.range,
     this.arrivalId,
     this.departureId,
     this.minCapacity,
+    this.imageUrl,
+    this.category,
+    this.note,
+    this.expiration,
   });
 }

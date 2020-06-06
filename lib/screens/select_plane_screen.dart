@@ -69,9 +69,30 @@ class ChooseAirplaneState extends State<ChooseAirplane> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Choose Airplane'),
+        title: RichText(
+          text: TextSpan(
+            style: Theme.of(context)
+                .textTheme
+                .headline6
+                .copyWith(fontWeight: FontWeight.bold),
+            children: [
+              TextSpan(
+                text: "Select ",
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              TextSpan(
+                text: "Airplane",
+                style: TextStyle(color: Theme.of(context).accentColor),
+              ),
+            ],
+          ),
+        ),
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0,
       ),
       body: Container(
         child: Column(

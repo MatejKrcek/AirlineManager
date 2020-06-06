@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert' as convert;
+import 'package:provider/provider.dart';
 
 import './screens/offers_overview_screen.dart';
 import './screens/main_overview_screen.dart';
@@ -7,9 +9,7 @@ import './screens/inventory_screen.dart';
 import './screens/shop_screen.dart';
 import './screens/stats_screen.dart';
 import './screens/auth_screen.dart';
-
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert' as convert;
+import './providers/user_provider.dart';
 
 void main() {
   runApp(MyApp());
@@ -50,29 +50,28 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Airline Manager',
-      theme: ThemeData(
-        primaryColor: Color(0xFFFFC61F),
-        accentColor: Color.fromRGBO(40, 51, 74, 1),
-        textTheme: TextTheme(
-          bodyText1: TextStyle(
-            color: Color.fromRGBO(40, 51, 74, 0.9)
+    return ChangeNotifierProvider(
+      create: (ctx) => UserProvider(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Airline Manager',
+        theme: ThemeData(
+          primaryColor: Color(0xFFFFC61F),
+          accentColor: Color.fromRGBO(40, 51, 74, 1),
+          textTheme: TextTheme(
+            bodyText1: TextStyle(color: Color.fromRGBO(40, 51, 74, 0.9)),
+            bodyText2: TextStyle(color: Color.fromRGBO(40, 51, 74, 0.9)),
           ),
-          bodyText2: TextStyle(
-            color: Color.fromRGBO(40, 51, 74, 0.9)
-          ),
+          visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        home: createAcc ? AuthScreen() : MainOverviewScreen(),
+        routes: {
+          OffersOverviewScreen.routeName: (ctx) => OffersOverviewScreen(),
+          InventoryScreen.routeName: (ctx) => InventoryScreen(),
+          ShopScreen.routeName: (ctx) => ShopScreen(),
+          StatsScreen.routeName: (ctx) => StatsScreen(),
+        },
       ),
-      home: createAcc ? AuthScreen() : MainOverviewScreen(),
-      routes: {
-        OffersOverviewScreen.routeName: (ctx) => OffersOverviewScreen(),
-        InventoryScreen.routeName: (ctx) => InventoryScreen(),
-        ShopScreen.routeName: (ctx) => ShopScreen(),
-        StatsScreen.routeName: (ctx) => StatsScreen(),
-      },
     );
   }
 }

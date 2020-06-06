@@ -32,16 +32,16 @@ class AppDrawer extends StatelessWidget {
               automaticallyImplyLeading: false,
             ),
             ListTile(
-              leading: Icon(Icons.insert_chart),
-              title: Text('Overview'),
+              leading: const Icon(Icons.insert_chart),
+              title: const Text('Overview'),
               onTap: () {
                 Navigator.of(context).pushReplacementNamed('/');
               },
             ),
             Divider(),
             ListTile(
-              leading: Icon(Icons.local_offer),
-              title: Text('Flight Offers'),
+              leading: const Icon(Icons.local_offer),
+              title: const Text('Flight Offers'),
               onTap: () {
                 Navigator.of(context).pushReplacementNamed('/offers-screen');
               },
@@ -49,23 +49,23 @@ class AppDrawer extends StatelessWidget {
             Divider(),
             ListTile(
               leading: Icon(Icons.airplanemode_active),
-              title: Text('Inventory'),
+              title: const Text('Inventory'),
               onTap: () {
                 Navigator.of(context).pushReplacementNamed('/inventory-screen');
               },
             ),
             Divider(),
             ListTile(
-              leading: Icon(Icons.shopping_cart),
-              title: Text('Shop'),
+              leading: const Icon(Icons.shopping_cart),
+              title: const Text('Shop'),
               onTap: () {
                 Navigator.of(context).pushReplacementNamed('/shop-screen');
               },
             ),
             Divider(),
             ListTile(
-              leading: Icon(Icons.show_chart),
-              title: Text('Statistics'),
+              leading: const Icon(Icons.show_chart),
+              title: const Text('Statistics'),
               onTap: () {
                 Navigator.of(context).pushReplacementNamed('/stats-screen');
               },
@@ -78,8 +78,8 @@ class AppDrawer extends StatelessWidget {
                   margin: EdgeInsets.only(
                     left: 5,
                   ),
-                  child: Text(
-                    '0.9.3+1 Alfa',
+                  child: const Text(
+                    '0.9.4+1 Alfa',
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: 10,

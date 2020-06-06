@@ -36,4 +36,4 @@ class User {
     this.aircrafts,
     this.flights,
   });
-} 
+}

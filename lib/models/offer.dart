@@ -13,19 +13,27 @@ class Offer {
   int time;
   String departureId;
   String arrivalId;
+  String arrivalTime;
+  String category;
+  String note;
+  String imageUrl;
 
   Offer({
-    @required this.id,
-    @required this.departureDes,
-    @required this.arrivalDes,
-    @required this.price,
-    @required this.time,
-    @required this.departureTime,
-    @required this.created,
-    @required this.range,
-    @required this.minCapacity,
-    @required this.expiration,
+    this.id,
+    this.departureDes,
+    this.arrivalDes,
+    this.price,
+    this.time,
+    this.departureTime,
+    this.created,
+    this.range,
+    this.minCapacity,
+    this.expiration,
     this.departureId,
     this.arrivalId,
+    this.note,
+    this.arrivalTime,
+    this.category,
+    this.imageUrl,
   });
 }

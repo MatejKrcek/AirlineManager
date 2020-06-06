@@ -8,14 +8,16 @@ class Airplane {
   int distance;
   int speed;
   String imageUrl;
+  String note;
 
   Airplane({
-    @required this.id,
-    @required this.name,
-    @required this.price,
-    @required this.seats,
-    @required this.speed,
-    @required this.distance,
-    @required this.imageUrl,
+    this.id,
+    this.name,
+    this.price,
+    this.seats,
+    this.speed,
+    this.distance,
+    this.imageUrl,
+    this.note,
   });
 }
