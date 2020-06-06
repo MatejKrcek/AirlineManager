@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'dart:math';
-import 'dart:convert' as convert;
+import 'package:provider/provider.dart';
 
+import '../providers/auth_provider.dart';
 import '../widgets/auth_form.dart';
-import '../models/user.dart';
-import './main_overview_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -23,52 +19,15 @@ class _AuthScreenState extends State<AuthScreen> {
     String airlineName,
     BuildContext ctx,
   ) async {
-    // print(username);
-    // print(airlineName);
-
-    // if (!prefs.containsKey('data')) {
-    //   print('oops');
-    //   return false;
-    // }
-
-    // final extractedUserData =
-    //     convert.jsonDecode(prefs.getString('data')) as Map<String, Object>;
-    // final id = extractedUserData['id'];
-
     try {
       setState(() {
         _isLoading = true;
       });
-      var url =
-          'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/personCreate?personName=$username';
 
-      var response = await http.get(url);
-      if (response.statusCode == 200) {
-        var jsonResponse = convert.jsonDecode(response.body);
-
-        String id = jsonResponse['personId'];
-        print(id);
-
-        setState(() {
-          User.uid = id;
-        });
-
-        final prefs = await SharedPreferences.getInstance();
-        final key = 'data';
-        final userData = convert.jsonEncode({
-          'username': username,
-          'airlineName': airlineName,
-          'id': id,
-        });
-        prefs.setString(key, userData);
-        print('saved $userData');
-      }
+      await Provider.of<AuthProvider>(context, listen: false)
+          .creataAcc(username, airlineName);
 
       print('done');
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => MainOverviewScreen()),
-      );
     } on PlatformException catch (err) {
       var message = 'An error occurred, pelase check your credentials!';
 

@@ -24,9 +24,9 @@ class ChooseAirplaneState extends State<ChooseAirplane> {
   var duplicateItems = listOfNames;
   var items = List<String>();
 
-  void saveFlavor(int index, List items) {
+  void savePlane(int index, List items) {
     print(items[index]);
-
+    
     Navigator.pop(context, index);
   }
 
@@ -119,7 +119,7 @@ class ChooseAirplaneState extends State<ChooseAirplane> {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
-                      saveFlavor(index, items);
+                      savePlane(index, items);
                     },
                     child: Card(
                       elevation: 3,

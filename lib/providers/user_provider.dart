@@ -7,6 +7,9 @@ import '../models/myFlights.dart';
 import '../models/myAirplanes.dart';
 
 class UserProvider with ChangeNotifier {
+  final String _userId;
+  UserProvider(this._userId);
+
   List<User> _user = [];
   List<MyFlights> _myFlights = [];
   List<MyFlights> _myActiveFlights = [];
@@ -16,6 +19,10 @@ class UserProvider with ChangeNotifier {
 
   List<User> get user {
     return [..._user];
+  }
+
+  String get userId{
+    return _userId;
   }
 
   List<MyFlights> get myFlights {
@@ -30,14 +37,12 @@ class UserProvider with ChangeNotifier {
     return [..._myPlanes];
   }
 
-  //USERID - getUser EDIT!!!
-
   Future<void> getUser() async {
-    User.uid = '-M8oXlLa-7hZgyTIR_y8'; //POZOR
+    // User.uid = '-M8oXlLa-7hZgyTIR_y8'; //POZOR
     _user = [];
-    print(User.uid);
+    // print(User.uid);
     var url =
-        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=${User.uid}';
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=$_userId';
 
     try {
       var _response = await http.get(url);
@@ -78,7 +83,7 @@ class UserProvider with ChangeNotifier {
 
     countPlanes = 0;
     var url =
-        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=${User.uid}';
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=$_userId';
 
     try {
       var _response = await http.get(url);
@@ -127,7 +132,7 @@ class UserProvider with ChangeNotifier {
 
     countFlights = 0;
     var url =
-        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=${User.uid}';
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=$_userId';
 
     try {
       var _response = await http.get(url);
