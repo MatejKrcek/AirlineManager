@@ -15,8 +15,8 @@ class KiwiProvider with ChangeNotifier {
   void openKiwi() async {
     const url = 'https://kiwi.com';
     if (await canLaunch(url)) {
-      await launch(url);
-      print('ano');
+      await launch(url);    
+      print('anoano');
     } else {
       throw 'Could not launch $url';
     }

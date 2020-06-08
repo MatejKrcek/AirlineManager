@@ -30,6 +30,9 @@ class MyApp extends StatelessWidget {
             return;
           },
         ),
+        // ChangeNotifierProvider(
+        //   create: (ctx) => OffersProvider(),
+        // ),
         ChangeNotifierProxyProvider<UserProvider, OffersProvider>(
           update: (ctx, user, _) =>
               OffersProvider(user.myActiveFlights, user.myPlanes, user.userId),

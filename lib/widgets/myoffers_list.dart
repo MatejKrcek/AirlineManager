@@ -18,6 +18,7 @@ class MyOffersList extends StatelessWidget {
             ),
           );
         } else {
+          print(Provider.of<UserProvider>(context, listen: false).myActiveFlights.length);
           return Consumer<UserProvider>(
             builder: (ctx, user, _) => Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),

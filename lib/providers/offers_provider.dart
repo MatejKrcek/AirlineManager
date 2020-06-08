@@ -30,6 +30,7 @@ class OffersProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         print('claimed');
+        notifyListeners();
         return;
       } else {
         print('error');
@@ -72,6 +73,7 @@ class OffersProvider with ChangeNotifier {
           ];
           _allFlights.add(_flightList[0]);
         }
+        // notifyListeners();
       } else {
         print('error');
       }
@@ -80,17 +82,4 @@ class OffersProvider with ChangeNotifier {
     }
   }
 
-  // void navigate(
-  //   int index,
-  //   int position,
-  //   BuildContext context,
-  // ) async {
-  //   final result = await Navigator.push(
-  //     context,
-  //     MaterialPageRoute(
-  //         builder: (context) => ChooseAirplane(myPlanes, allFlights, index)),
-  //   );
-  //   position = result;
-  //   //Initstate();
-  // }
 }

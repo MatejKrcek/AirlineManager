@@ -21,7 +21,7 @@ class UserProvider with ChangeNotifier {
     return [..._user];
   }
 
-  String get userId{
+  String get userId {
     return _userId;
   }
 
@@ -69,7 +69,7 @@ class UserProvider with ChangeNotifier {
           ),
         ];
         _user.add(_newUser[0]);
-        notifyListeners();
+        // notifyListeners();
       } else {
         print('error');
       }
@@ -118,7 +118,7 @@ class UserProvider with ChangeNotifier {
         countPlanes = _myPlanes.length - 1;
         _myPlanes.sort((a, b) => a.name.compareTo(b.name));
 
-        notifyListeners();
+        // notifyListeners();
       } else {
         print('error');
       }
@@ -128,8 +128,19 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<void> getFlights() async {
-    _myFlights = [];
+    for (var i = 0; i < _myActiveFlights.length; i++) {
+      if (DateTime.parse(_myActiveFlights[i].arrivalTime)
+          .isAfter(DateTime.now())) {
+        _myFlights[i].onAir = true;
+        print('nope');
+      } else {
+        _myFlights[i].onAir = false;
+        myActiveFlights.removeAt(i);
+        print('removed');
+      }
+    }
 
+    _myFlights = [];
     countFlights = 0;
     var url =
         'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=persons&personId=$_userId';
@@ -167,9 +178,9 @@ class UserProvider with ChangeNotifier {
                 .isAfter(DateTime.now())) {
               print('future');
               _myActiveFlights.add(myFlights[i]);
-              _myFlights[0].onAir = true;
+              _myFlights[i].onAir = true;
             } else {
-              _myFlights[0].onAir = false;
+              _myFlights[i].onAir = false;
               //myActiveFlights.removeAt(0);
               print('done');
             }
@@ -178,7 +189,7 @@ class UserProvider with ChangeNotifier {
           countFlights = _myFlights.length - 1;
         }
 
-        notifyListeners();
+        // notifyListeners();
       } else {
         print('error');
       }

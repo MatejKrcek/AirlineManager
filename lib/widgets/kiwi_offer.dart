@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/kiwi_provider.dart';
+import '../models/offer.dart';
+import '../providers/offers_provider.dart';
 
 class KiwiOffer extends StatelessWidget {
   const KiwiOffer({
@@ -15,9 +17,12 @@ class KiwiOffer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final kiwi = Provider.of<OffersProvider>(context, listen: false);
+    // final call = kiwi.getFlights();
+    // final List<Offer> allFlights = kiwi.allFlights;
     return FutureBuilder(
-      future: Provider.of<KiwiProvider>(context, listen: true)
-          .getKiwiData(isClaimed, index),
+      future: Provider.of<OffersProvider>(context, listen: false)
+          .getFlights(),
       builder: (ctx, dataSnapshot) {
         if (dataSnapshot.connectionState == ConnectionState.waiting) {
           return Center(
@@ -27,7 +32,10 @@ class KiwiOffer extends StatelessWidget {
             ),
           );
         } else {
-          return Consumer<KiwiProvider>(
+          print('ano');
+          // final List allFlights = Provider.of<OffersProvider>(context, listen: false).allFlights;
+          print(Provider.of<OffersProvider>(context, listen: false).allFlights.length);
+          return Consumer<OffersProvider>(
             builder: (ctx, kiwi, _) => Container(
               child: Card(
                 color: Color.fromRGBO(236, 248, 247, 1),

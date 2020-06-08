@@ -39,6 +39,7 @@ class ChooseAirplaneState extends State<ChooseAirplane> {
       duplicateItems.add(widget.myAirplanes[i].name);
     }
     items.addAll(duplicateItems);
+    print(items);
     items.sort((a, b) => a.compareTo(b));
     super.initState();
   }

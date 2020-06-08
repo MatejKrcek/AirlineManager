@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kiwi/models/offer.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
 
@@ -33,6 +34,8 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
 
   void _navigate() async {
     final data = Provider.of<OffersProvider>(context, listen: false);
+    print(data.myPlanes);
+    print('planes');
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -68,6 +71,7 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
   }
 
   void setup() {
+    print('data err');
     final data = Provider.of<OffersProvider>(context, listen: true);
 
     if (data.myRunningFlights[widget.index].onAir) {
@@ -87,7 +91,8 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
       print(progToAd);
       print(progress);
 
-      double timeLeft = data.myRunningFlights[widget.index].flightTime.toDouble();
+      double timeLeft =
+          data.myRunningFlights[widget.index].flightTime.toDouble();
       countdown = new Timer.periodic(
         oneSec,
         (Timer timer) => setState(

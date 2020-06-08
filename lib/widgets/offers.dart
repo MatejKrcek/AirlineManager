@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../screens/claim_offer_screen.dart';
 import '../providers/offers_provider.dart';
+import '../providers/user_provider.dart';
 
 class Offers extends StatelessWidget {
   final bool onFlight;
@@ -24,9 +25,12 @@ class Offers extends StatelessWidget {
             ),
           );
         } else {
+          final data = Provider.of<UserProvider>(context, listen: false);
+          final call = data.getFlights();
+          final myRunningFlights = data.myActiveFlights;
           return Consumer<OffersProvider>(
             builder: (ctx, offers, _) =>
-                onFlight && offers.myRunningFlights.length == 0
+                onFlight && (offers.myRunningFlights.length == 0 || myRunningFlights.length == 0)
                     ? Center(
                         child: const Text(
                             'Quite empty, isn\'t it? Maybe check filters.'),
