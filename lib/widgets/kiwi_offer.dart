@@ -2,27 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/kiwi_provider.dart';
-import '../models/offer.dart';
-import '../providers/offers_provider.dart';
 
 class KiwiOffer extends StatelessWidget {
-  const KiwiOffer({
-    Key key,
-    @required this.index,
+  KiwiOffer(
+    this.index,
     this.isClaimed,
-  }) : super(key: key);
+  );
 
   final int index;
   final bool isClaimed;
 
   @override
   Widget build(BuildContext context) {
-    // final kiwi = Provider.of<OffersProvider>(context, listen: false);
-    // final call = kiwi.getFlights();
-    // final List<Offer> allFlights = kiwi.allFlights;
     return FutureBuilder(
-      future: Provider.of<OffersProvider>(context, listen: false)
-          .getFlights(),
+      future: isClaimed
+          ? Provider.of<KiwiProvider>(context, listen: false).getMyFlights()
+          : Provider.of<KiwiProvider>(context, listen: false).getFlights(),
       builder: (ctx, dataSnapshot) {
         if (dataSnapshot.connectionState == ConnectionState.waiting) {
           return Center(
@@ -32,10 +27,7 @@ class KiwiOffer extends StatelessWidget {
             ),
           );
         } else {
-          print('ano');
-          // final List allFlights = Provider.of<OffersProvider>(context, listen: false).allFlights;
-          print(Provider.of<OffersProvider>(context, listen: false).allFlights.length);
-          return Consumer<OffersProvider>(
+          return Consumer<KiwiProvider>(
             builder: (ctx, kiwi, _) => Container(
               child: Card(
                 color: Color.fromRGBO(236, 248, 247, 1),

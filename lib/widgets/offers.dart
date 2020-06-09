@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../screens/claim_offer_screen.dart';
 import '../providers/offers_provider.dart';
-import '../providers/user_provider.dart';
 
 class Offers extends StatelessWidget {
   final bool onFlight;
@@ -15,7 +14,9 @@ class Offers extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Provider.of<OffersProvider>(context, listen: false).getFlights(),
+      future: !onFlight
+          ? Provider.of<OffersProvider>(context, listen: false).getFlights()
+          : Provider.of<OffersProvider>(context, listen: false).getMyFlights(),
       builder: (ctx, dataSnapshot) {
         if (dataSnapshot.connectionState == ConnectionState.waiting) {
           return Center(
@@ -25,19 +26,17 @@ class Offers extends StatelessWidget {
             ),
           );
         } else {
-          final data = Provider.of<UserProvider>(context, listen: false);
-          final call = data.getFlights();
-          final myRunningFlights = data.myActiveFlights;
+          print(Provider.of<OffersProvider>(context, listen: false).myActiveFlights.length);
           return Consumer<OffersProvider>(
             builder: (ctx, offers, _) =>
-                onFlight && (offers.myRunningFlights.length == 0 || myRunningFlights.length == 0)
+                onFlight && offers.myActiveFlights.length == 0
                     ? Center(
                         child: const Text(
                             'Quite empty, isn\'t it? Maybe check filters.'),
                       )
                     : ListView.builder(
                         itemCount: onFlight
-                            ? offers.myRunningFlights.length
+                            ? offers.myActiveFlights.length
                             : offers.allFlights.length,
                         itemBuilder: (context, index) => Card(
                           elevation: 5,
@@ -46,10 +45,10 @@ class Offers extends StatelessWidget {
                             children: <Widget>[
                               ListTile(
                                 title: Text(onFlight
-                                    ? '${offers.myRunningFlights[index].departureDes} -> ${offers.myRunningFlights[index].arrivalDes}'
+                                    ? '${offers.myActiveFlights[index].departureDes} -> ${offers.myActiveFlights[index].arrivalDes}'
                                     : '${offers.allFlights[index].departureDes} -> ${offers.allFlights[index].arrivalDes}'),
                                 subtitle: Text(onFlight
-                                    ? 'Reward: ${offers.myRunningFlights[index].reward.toString()} coins'
+                                    ? 'Reward: ${offers.myActiveFlights[index].reward.toString()} coins'
                                     : 'Reward: ${offers.allFlights[index].price.toString()} coins'),
                                 trailing: FlatButton(
                                   onPressed: () {

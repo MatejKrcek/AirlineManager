@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import '../models/user.dart';
 import '../models/myFlights.dart';
 import '../models/myAirplanes.dart';
+import '../models/airplane.dart';
 
 class UserProvider with ChangeNotifier {
   final String _userId;
@@ -14,11 +15,16 @@ class UserProvider with ChangeNotifier {
   List<MyFlights> _myFlights = [];
   List<MyFlights> _myActiveFlights = [];
   List<MyAirplane> _myPlanes = [];
+  List<Airplane> _listOfAirlanes = [];
   int countPlanes = 0;
   int countFlights = 0;
 
   List<User> get user {
     return [..._user];
+  }
+
+  List<Airplane> get listOfAirplanes {
+    return [..._listOfAirlanes];
   }
 
   String get userId {
@@ -128,18 +134,6 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<void> getFlights() async {
-    for (var i = 0; i < _myActiveFlights.length; i++) {
-      if (DateTime.parse(_myActiveFlights[i].arrivalTime)
-          .isAfter(DateTime.now())) {
-        _myFlights[i].onAir = true;
-        print('nope');
-      } else {
-        _myFlights[i].onAir = false;
-        myActiveFlights.removeAt(i);
-        print('removed');
-      }
-    }
-
     _myFlights = [];
     countFlights = 0;
     var url =
@@ -155,6 +149,7 @@ class UserProvider with ChangeNotifier {
         }
 
         if (_map['flights'] != null) {
+          _myActiveFlights = [];
           var _flights = _map['flights'];
           int i = 0;
           for (var item in _flights.keys) {
@@ -190,6 +185,84 @@ class UserProvider with ChangeNotifier {
         }
 
         // notifyListeners();
+      } else {
+        print('error');
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future getAllAirlanes() async {
+    const url =
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/getData?entity=aircrafts';
+
+    try {
+      var response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> map = convert.jsonDecode(response.body);
+
+        if (map == null) {
+          return;
+        }
+
+        for (var item in map.keys) {
+          final List<Airplane> _airplaneListDb = [
+            Airplane(
+              id: item,
+              name: map[item]['name'],
+              speed: map[item]['speed'],
+              price: map[item]['price'],
+              seats: map[item]['capacity'],
+              distance: map[item]['range'],
+              imageUrl: map[item]['imageUrl'],
+            ),
+          ];
+          // print(airplaneListDb[0]);
+            _listOfAirlanes.add(_airplaneListDb[0]);
+        }
+
+        _listOfAirlanes.sort((a, b) => a.name.compareTo(b.name));
+      } else {
+        print('error');
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future buyAirplane(int index) async {
+    var url =
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/buyAircraft?personId=$_userId&aircraftIdentity=${_listOfAirlanes[index].id}';
+
+    try {
+      var response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> map = convert.jsonDecode(response.body);
+
+        if (map == null) {
+          return;
+        }
+        
+      } else {
+        print('error');
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future sell(int index) async {
+    var url =
+        'https://us-central1-airlines-manager-b7e46.cloudfunctions.net/api/sellAircraft?personId=$_userId&aircraftIdentity=${_myPlanes[index].id}';
+
+    try {
+      var response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        print('done');
       } else {
         print('error');
       }

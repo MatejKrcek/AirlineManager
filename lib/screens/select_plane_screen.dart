@@ -5,12 +5,10 @@ import '../models/offer.dart';
 
 class ChooseAirplane extends StatefulWidget {
   final List<MyAirplane> myAirplanes;
-  final List<Offer> offers;
   final int index;
 
   ChooseAirplane(
     this.myAirplanes,
-    this.offers,
     this.index,
   );
 

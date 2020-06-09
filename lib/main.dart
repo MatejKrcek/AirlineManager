@@ -30,19 +30,15 @@ class MyApp extends StatelessWidget {
             return;
           },
         ),
-        // ChangeNotifierProvider(
-        //   create: (ctx) => OffersProvider(),
-        // ),
-        ChangeNotifierProxyProvider<UserProvider, OffersProvider>(
-          update: (ctx, user, _) =>
-              OffersProvider(user.myActiveFlights, user.myPlanes, user.userId),
+        ChangeNotifierProxyProvider<AuthProvider, OffersProvider>(
+          update: (ctx, auth, _) => OffersProvider(auth.userId),
           create: (BuildContext context) {
             return;
           },
         ),
-        ChangeNotifierProxyProvider<OffersProvider, KiwiProvider>(
-          update: (ctx, offer, _) =>
-              KiwiProvider(offer.myRunningFlights, offer.allFlights),
+        ChangeNotifierProxyProvider<AuthProvider, KiwiProvider>(
+          update: (ctx, auth, _) =>
+              KiwiProvider(auth.userId),
           create: (BuildContext context) {
             return;
           },

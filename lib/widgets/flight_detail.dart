@@ -1,28 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:kiwi/models/myFlights.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/offers_provider.dart';
-import '../screens/claim_offer_screen.dart';
-import '../providers/user_provider.dart';
+import 'package:intl/intl.dart';
 
 class FlightDetail extends StatelessWidget {
-  const FlightDetail({
-    Key key,
-    @required this.widget,
-    @required this.position,
-    @required this.navigate,
-  }) : super(key: key);
+  FlightDetail(
+    this.index,
+    this.isClaimed,
+    this.position,
+    this.navigate,
+  );
 
-  final ClaimOfferScreen widget;
+  final int index;
   final int position;
+  final bool isClaimed;
   final void Function() navigate;
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: widget.isClaimed
-          ? Provider.of<UserProvider>(context, listen: false).getFlights()
+      future: isClaimed
+          ? Provider.of<OffersProvider>(context, listen: false).getMyFlights()
           : Provider.of<OffersProvider>(context, listen: false).getFlights(),
       builder: (ctx, dataSnapshot) {
         if (dataSnapshot.connectionState == ConnectionState.waiting) {
@@ -33,20 +32,17 @@ class FlightDetail extends StatelessWidget {
             ),
           );
         } else {
-          print(Provider.of<OffersProvider>(context, listen: false)
-              .allFlights
-              .length);
           return Consumer<OffersProvider>(
             builder: (ctx, offers, _) => Card(
               elevation: 5,
               child: Column(
                 children: <Widget>[
                   ListTile(
-                    title: Text(!widget.isClaimed
-                        ? '${offers.allFlights[widget.index].departureDes} -> ${offers.allFlights[widget.index].arrivalDes}'
-                        : '${offers.myRunningFlights[widget.index].departureDes} -> ${offers.myRunningFlights[widget.index].arrivalDes}'),
+                    title: Text(!isClaimed
+                        ? '${offers.allFlights[index].departureDes} -> ${offers.allFlights[index].arrivalDes}'
+                        : '${offers.myActiveFlights[index].departureDes} -> ${offers.myActiveFlights[index].arrivalDes}'),
                   ),
-                  if (widget.isClaimed)
+                  if (isClaimed)
                     Row(
                       children: <Widget>[
                         Container(
@@ -55,7 +51,7 @@ class FlightDetail extends StatelessWidget {
                             bottom: 5,
                           ),
                           child: Text(
-                            'Flight ID: ${offers.myRunningFlights[widget.index].flightNumber}',
+                            'Flight ID: ${offers.myActiveFlights[index].flightNumber}',
                             textAlign: TextAlign.left,
                             style: TextStyle(
                               fontSize: 15,
@@ -72,9 +68,9 @@ class FlightDetail extends StatelessWidget {
                           bottom: 5,
                         ),
                         child: Text(
-                          widget.isClaimed
-                              ? 'Flight Time: ${offers.myRunningFlights[widget.index].flightTime} minutes'
-                              : 'Flight Time: ${offers.allFlights[widget.index].time} minutes',
+                          isClaimed
+                              ? 'Flight Time: ${offers.myActiveFlights[index].flightTime} minutes'
+                              : 'Flight Time: ${offers.allFlights[index].time} minutes',
                           textAlign: TextAlign.left,
                           style: TextStyle(
                             fontSize: 15,
@@ -83,117 +79,135 @@ class FlightDetail extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(
-                          left: 15,
-                          bottom: 5,
-                        ),
-                        child: RichText(
-                          text: TextSpan(
-                            text: 'Required capacity: ',
+                  if (isClaimed)
+                    Row(
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(
+                            left: 15,
+                            bottom: 5,
+                          ),
+                          child: Text(
+                            'Arrive at: ${DateFormat.MMMMd().add_Hm().format(DateTime.parse(offers.myActiveFlights[index].arrivalTime).add(Duration(hours: 2)))}',
+                            textAlign: TextAlign.left,
                             style: TextStyle(
                               fontSize: 15,
-                              color: Colors.black,
                             ),
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: widget.isClaimed
-                                    ? offers.myRunningFlights[widget.index]
-                                        .minCapacity
-                                        .toString()
-                                    : offers
-                                        .allFlights[widget.index].minCapacity
-                                        .toString(),
-                                style: TextStyle(
-                                  color: widget.isClaimed
-                                      ? Colors.black
-                                      : position == null
-                                          ? Colors.red
-                                          : offers.allFlights[widget.index]
-                                                      .minCapacity >=
-                                                  offers
-                                                      .myPlanes[position].seats
-                                              ? Colors.black
-                                              : Colors.red,
-                                  fontWeight: widget.isClaimed
-                                      ? FontWeight.normal
-                                      : position == null
-                                          ? FontWeight.bold
-                                          : offers.allFlights[widget.index]
-                                                      .minCapacity >=
-                                                  offers
-                                                      .myPlanes[position].seats
-                                              ? FontWeight.normal
-                                              : FontWeight.bold,
-                                ),
-                              ),
-                              TextSpan(
-                                text: ' seats',
-                                style: TextStyle(fontWeight: FontWeight.normal),
-                              ),
-                            ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(
-                          left: 15,
-                          bottom: 5,
-                        ),
-                        child: RichText(
-                          text: TextSpan(
-                            text: 'Required range ',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black,
-                            ),
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: widget.isClaimed
-                                    ? offers
-                                        .myRunningFlights[widget.index].range
-                                        .toString()
-                                    : offers.allFlights[widget.index].range
-                                        .toString(),
-                                style: TextStyle(
-                                  color: widget.isClaimed
-                                      ? Colors.black
-                                      : position == null
-                                          ? Colors.red
-                                          : offers.allFlights[widget.index]
-                                                      .range >=
-                                                  offers.myPlanes[position]
-                                                      .distance
-                                              ? Colors.black
-                                              : Colors.red,
-                                  fontWeight: widget.isClaimed
-                                      ? FontWeight.normal
-                                      : position == null
-                                          ? FontWeight.bold
-                                          : offers.allFlights[widget.index]
-                                                      .range >=
-                                                  offers.myPlanes[position]
-                                                      .distance
-                                              ? FontWeight.normal
-                                              : FontWeight.bold,
+                      ],
+                    ),
+                  if (!isClaimed)
+                    Row(
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(
+                            left: 15,
+                            bottom: 5,
+                          ),
+                          child: RichText(
+                            text: TextSpan(
+                              text: 'Required capacity: ',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.black,
+                              ),
+                              children: <TextSpan>[
+                                TextSpan(
+                                  text: isClaimed
+                                      ? offers
+                                          .myActiveFlights[index].minCapacity
+                                          .toString()
+                                      : offers.allFlights[index].minCapacity
+                                          .toString(),
+                                  style: TextStyle(
+                                    color: isClaimed
+                                        ? Colors.black
+                                        : position == null
+                                            ? Colors.red
+                                            : offers.allFlights[index]
+                                                        .minCapacity >=
+                                                    offers.myPlanes[position]
+                                                        .seats
+                                                ? Colors.black
+                                                : Colors.red,
+                                    fontWeight: isClaimed
+                                        ? FontWeight.normal
+                                        : position == null
+                                            ? FontWeight.bold
+                                            : offers.allFlights[index]
+                                                        .minCapacity >=
+                                                    offers.myPlanes[position]
+                                                        .seats
+                                                ? FontWeight.normal
+                                                : FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              TextSpan(
-                                text: ' km',
-                                style: TextStyle(fontWeight: FontWeight.normal),
-                              ),
-                            ],
+                                TextSpan(
+                                  text: ' seats',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.normal),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  if (!isClaimed)
+                    Row(
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(
+                            left: 15,
+                            bottom: 5,
+                          ),
+                          child: RichText(
+                            text: TextSpan(
+                              text: 'Required range ',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.black,
+                              ),
+                              children: <TextSpan>[
+                                TextSpan(
+                                  text: isClaimed
+                                      ? offers.myActiveFlights[index].range
+                                          .toString()
+                                      : offers.allFlights[index].range
+                                          .toString(),
+                                  style: TextStyle(
+                                    color: isClaimed
+                                        ? Colors.black
+                                        : position == null
+                                            ? Colors.red
+                                            : offers.allFlights[index].range >=
+                                                    offers.myPlanes[position]
+                                                        .distance
+                                                ? Colors.black
+                                                : Colors.red,
+                                    fontWeight: isClaimed
+                                        ? FontWeight.normal
+                                        : position == null
+                                            ? FontWeight.bold
+                                            : offers.allFlights[index].range >=
+                                                    offers.myPlanes[position]
+                                                        .distance
+                                                ? FontWeight.normal
+                                                : FontWeight.bold,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: ' km',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.normal),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   Row(
                     children: <Widget>[
                       Container(
@@ -202,9 +216,9 @@ class FlightDetail extends StatelessWidget {
                           bottom: 5,
                         ),
                         child: Text(
-                          widget.isClaimed
-                              ? 'Reward: ${offers.myRunningFlights[widget.index].reward} coins'
-                              : 'Reward: ${offers.allFlights[widget.index].price} coins',
+                          isClaimed
+                              ? 'Reward: ${offers.myActiveFlights[index].reward} coins'
+                              : 'Reward: ${offers.allFlights[index].price} coins',
                           textAlign: TextAlign.left,
                           style: TextStyle(
                             fontSize: 15,
@@ -216,7 +230,7 @@ class FlightDetail extends StatelessWidget {
                   SizedBox(
                     height: 20,
                   ),
-                  if (!widget.isClaimed)
+                  if (!isClaimed)
                     Row(
                       children: <Widget>[
                         Container(
@@ -244,11 +258,11 @@ class FlightDetail extends StatelessWidget {
                           child: Text(
                             'SELECT AIRPLANE',
                             style: TextStyle(
-                                color: widget.isClaimed
+                                color: isClaimed
                                     ? Colors.grey
                                     : Theme.of(context).primaryColor),
                           ),
-                          onPressed: widget.isClaimed
+                          onPressed: isClaimed
                               ? null
                               : () {
                                   // Provider.of<OffersProvider>(context, listen: false).navigate(widget.index, position, context);
@@ -266,40 +280,34 @@ class FlightDetail extends StatelessWidget {
                           child: Text(
                             'CLAIM',
                             style: TextStyle(
-                                color: widget.isClaimed
+                                color: isClaimed
                                     ? Colors.grey
                                     : position == null
                                         ? Colors.grey
                                         : offers.myPlanes[position].distance >=
-                                                    offers
-                                                        .allFlights[
-                                                            widget.index]
+                                                    offers.allFlights[index]
                                                         .range &&
                                                 offers.myPlanes[position]
                                                         .seats >=
-                                                    offers
-                                                        .allFlights[
-                                                            widget.index]
+                                                    offers.allFlights[index]
                                                         .minCapacity
                                             ? Theme.of(context).primaryColor
                                             : Colors.grey),
                           ),
-                          onPressed: widget.isClaimed
+                          onPressed: isClaimed
                               ? null
                               : position == null
                                   ? null
                                   : (offers.myPlanes[position].distance >=
-                                              offers.allFlights[widget.index]
-                                                  .range &&
+                                              offers.allFlights[index].range &&
                                           offers.myPlanes[position].seats >=
-                                              offers.allFlights[widget.index]
+                                              offers.allFlights[index]
                                                   .minCapacity)
                                       ? () async {
                                           await Provider.of<OffersProvider>(
                                                   context,
                                                   listen: false)
-                                              .claimOffer(
-                                                  position, widget.index);
+                                              .claimOffer(position, index);
                                           Navigator.pop(context);
                                         }
                                       : null,

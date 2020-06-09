@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kiwi/models/offer.dart';
+import 'package:kiwi/providers/kiwi_provider.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
 
@@ -34,13 +34,12 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
 
   void _navigate() async {
     final data = Provider.of<OffersProvider>(context, listen: false);
-    print(data.myPlanes);
-    print('planes');
+    final call = await data.getPlanes();
+    final planes = data.myPlanes;
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) =>
-              ChooseAirplane(data.myPlanes, data.allFlights, widget.index)),
+          builder: (context) => ChooseAirplane(planes, widget.index)),
     );
     setState(() {
       position = result;
@@ -73,16 +72,19 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
   void setup() {
     print('data err');
     final data = Provider.of<OffersProvider>(context, listen: true);
-
-    if (data.myRunningFlights[widget.index].onAir) {
+    if (data == null) {
+      return;
+    }
+    if (DateTime.parse(data.myActiveFlights[widget.index].arrivalTime)
+        .isAfter(DateTime.now())) {
       print('onair');
       DateTime arrival =
-          DateTime.parse(data.myRunningFlights[widget.index].arrivalTime);
+          DateTime.parse(data.myActiveFlights[widget.index].arrivalTime);
 
       Duration difference = arrival.difference(DateTime.now());
       double currentDifference = difference.inSeconds.toDouble();
       double totalDifference =
-          data.myRunningFlights[widget.index].flightTime.toDouble() * 60;
+          data.myActiveFlights[widget.index].flightTime.toDouble() * 60;
       setState(() {
         progToAd = 1 / totalDifference;
         progress = progToAd * (totalDifference - currentDifference);
@@ -92,7 +94,7 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
       print(progress);
 
       double timeLeft =
-          data.myRunningFlights[widget.index].flightTime.toDouble();
+          data.myActiveFlights[widget.index].flightTime.toDouble();
       countdown = new Timer.periodic(
         oneSec,
         (Timer timer) => setState(
@@ -105,13 +107,9 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
           },
         ),
       );
+    } else {
+      return;
     }
-    // if (widget.isClaimed) {
-    //   setState(() {
-    //     progress = 1;
-    //     status = 'Arrived';
-    //   });
-    // }
   }
 
   @override
@@ -126,9 +124,11 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.isClaimed) {
-      timer = Timer.periodic(Duration(seconds: 1), (Timer t) => update());
-    }
+    //if (widget.isClaimed) {
+    //Provider.of<KiwiProvider>(context, listen: true).getMyFlights();
+    //timer = Timer.periodic(Duration(seconds: 1), (Timer t) => update());
+    //setup();
+    //}
   }
 
   @override
@@ -204,19 +204,19 @@ class _ClaimOfferScreenState extends State<ClaimOfferScreen> {
                 height: 10,
               ),
               FlightDetail(
-                widget: widget,
-                position: position,
-                navigate: _navigate,
+                widget.index,
+                widget.isClaimed,
+                position,
+                _navigate,
               ),
               SizedBox(
                 height: 30,
               ),
-              if (widget.isClaimed)
-                FlightAnimation(
-                    progress: progress, index: widget.index, status: status),
+              // if (widget.isClaimed)
+              //   FlightAnimation(progress, widget.index, status),
               KiwiOffer(
-                index: widget.index,
-                isClaimed: widget.isClaimed,
+                widget.index,
+                widget.isClaimed,
               ),
             ],
           ),
