@@ -5,7 +5,8 @@ The most realistic Airline Manager mobile game. The game is running on Android &
 A project for Kiwi.com Mobile Challenge.
 
 Application is in alfa version. Beta version is coming soon.
-Do you want to try it? Contact me.
+Try it on Google Play! 
+https://play.google.com/store/apps/details?id=com.krcek.matej.airlinemanager
 
 ## General information
 
